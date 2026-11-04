@@ -18,7 +18,7 @@ const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 
 // ---------------- Almacenamiento ----------------
 const KEY = 'psicotrain.v1';
-const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'media', auto: 1, fx: 1, theme: 'auto', name: 'Lorena' }, stats: {}, days: [], errors: {} });
+const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'media', auto: 1, fx: 1, theme: 'auto', name: 'Lorena', apodos: 'Amparito, Pequeña, Amparo, Perrangana, Cuchifrita' }, stats: {}, days: [], errors: {} });
 let DB = (() => {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
@@ -88,7 +88,13 @@ function makeQuestion(cat, idx) {
 const raeLink = w => w ? ` <a class="rae" href="https://dle.rae.es/${encodeURIComponent(w)}" target="_blank" rel="noopener">📖 «${w}» en la RAE</a>` : '';
 
 // ---------------- Ánimo ----------------
-const nombre = () => (DB.settings.name || '').trim();
+// Casi siempre usa el nombre; de vez en cuando (40 %), uno de los apodos cariñosos
+const apodos = () => (DB.settings.apodos || '').split(',').map(s => s.trim()).filter(Boolean);
+const nombre = () => {
+  const n = (DB.settings.name || '').trim(), ap = apodos();
+  if (ap.length && (!n || Math.random() < .4)) return pick(ap);
+  return n;
+};
 function frase(tipo, vars = {}) {
   let f = Array.isArray(MOTIVA[tipo]) ? pick(MOTIVA[tipo]) : MOTIVA[tipo];
   for (const [k, v] of Object.entries(vars)) f = f.split('{' + k + '}').join(v);
@@ -363,6 +369,7 @@ function applyTheme() {
 }
 function renderSettings() {
   $('#nameInput').value = DB.settings.name || '';
+  $('#apodosInput').value = DB.settings.apodos || '';
   $$('.seg').forEach(seg => {
     const k = seg.dataset.key;
     [...seg.children].forEach(b => b.classList.toggle('on', String(DB.settings[k]) === b.dataset.v));
@@ -398,6 +405,7 @@ $('#btnAgain').onclick = () => startQuiz(Q.cats, Q.mode === 'review' && !errCoun
 $('#btnHome').onclick = () => { Q = null; renderHome(); show('home'); };
 $('#btnSettings').onclick = () => openSheet(true);
 $('#nameInput').addEventListener('input', e => { DB.settings.name = e.target.value.slice(0, 30); save(); renderHome(); });
+$('#apodosInput').addEventListener('input', e => { DB.settings.apodos = e.target.value.slice(0, 200); save(); });
 $('#motiv').onclick = nuevaFraseInicio;
 $('#btnClose').onclick = $('#overlay').onclick = () => openSheet(false);
 $('#btnReset').onclick = () => {
