@@ -305,3 +305,13 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
   transition: transform .35s cubic-bezier(.2, .9, .3, 1.3), opacity .3s;
 }
 .cheer.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+/* ---------- Demostración del giro / volteo ---------- */
+.hint { display: block; font-size: 13.5px; color: var(--muted); font-weight: 600; margin-top: 4px; }
+.demo { display: flex; gap: 14px; align-items: center; }
+.demofig {
+  flex: none; width: 84px; height: 84px; padding: 6px; border-radius: 16px; cursor: pointer;
+  background: var(--card-2); border: 1px solid var(--line);
+}
+.demofig svg { transform-origin: 50% 50%; }
+.replay { color: var(--muted); font-size: 12px; }

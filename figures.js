@@ -85,6 +85,15 @@ const Fig = (() => {
   const figOpts = (correct, wrongs, size) =>
     shuffle([{ html: svg(correct, size), ok: true, cells: correct }, ...wrongs.map(w => ({ html: svg(w, size), cells: w }))]);
   const DEG = { 1: '90° horario ↻', 2: '180°', 3: '90° antihorario ↺' };
+  // Describe cómo pasar de la original a la correcta (para la animación y la explicación)
+  const anim = (cs, size, flip, k) => ({ origHtml: svg(cs, size), anim: { flip, deg: [0, 90, 180, -90][k] } });
+  const describe = (flip, k) => {
+    const parts = [];
+    if (flip === 'x') parts.push('volteada en espejo ⇆');
+    if (flip === 'y') parts.push('volteada de arriba a abajo ⇅');
+    if (k) parts.push((flip ? 'y girada ' : 'girada ') + DEG[k]);
+    return parts.join(' ');
+  };
 
   // --- GIROS ---------------------------------------------------------------
   function giro(diff) {
@@ -101,7 +110,8 @@ const Fig = (() => {
         prompt: '¿Cuál es la <b>misma figura girada</b>?',
         figHtml: ref(o, 'Figura original'),
         options: figOpts(rot(o, k), wr, size),
-        explain: `La correcta es la original girada <b>${DEG[k]}</b>. Las demás están volteadas o cambian el punto de sitio.`,
+        explain: `Es la original <b>girada ${DEG[k]}</b>. Las demás están volteadas (en espejo) o tienen el cuadro rosa en otro sitio.`,
+        ...anim(o, size, null, k),
       };
     }
     if (t === 1) {
@@ -115,13 +125,14 @@ const Fig = (() => {
         prompt: `Si giramos la figura <b>${DEG[k]}</b>, ¿cómo queda?`,
         figHtml: ref(o, 'Figura original'),
         options: figOpts(rot(o, k), wr, size),
-        explain: `Girar ${DEG[k]}: imagina que la parte de arriba pasa a ${k === 1 ? 'la derecha' : k === 3 ? 'la izquierda' : 'abajo'}.`,
+        explain: `Girar ${DEG[k]}: lo que estaba arriba pasa a ${k === 1 ? 'la derecha' : k === 3 ? 'la izquierda' : 'abajo'}.`,
+        ...anim(o, size, null, k),
       };
     }
     // ¿Cuántos grados ha girado?
     const isFlip = Math.random() < .25;
-    const k = 1 + rnd(3);
-    const b = isFlip ? rot(flipLR(o), rnd(4)) : rot(o, k);
+    const k = 1 + rnd(3), j = rnd(4);
+    const b = isFlip ? rot(flipLR(o), j) : rot(o, k);
     const labels = [DEG[1], DEG[2], DEG[3], 'Ninguno: está volteada'];
     const correctIdx = isFlip ? 3 : k - 1;
     return {
@@ -129,7 +140,8 @@ const Fig = (() => {
       prompt: '¿Qué giro transforma la figura A en la B?',
       figHtml: `<div class="pair">${ref(o, 'A')}<div class="arrow">➜</div>${ref(b, 'B')}</div>`,
       options: labels.map((t, i) => ({ t, ok: i === correctIdx })),
-      explain: isFlip ? 'B es una imagen en espejo: ningún giro la produce.' : `B es A girada <b>${DEG[k]}</b>.`,
+      explain: isFlip ? `B es A <b>${describe('x', j)}</b>: por mucho que gires A, nunca coincide con B.` : `B es A <b>girada ${DEG[k]}</b>.`,
+      ...(isFlip ? anim(o, size, 'x', j) : anim(o, size, null, k)),
     };
   }
 
@@ -140,16 +152,18 @@ const Fig = (() => {
     const t = rnd(3);
     if (t === 0) {
       // ¿Cuál es la figura volteada?
-      const correct = rot(flipLR(o), diff === 'facil' ? 0 : rnd(4));
+      const j = diff === 'facil' ? 0 : rnd(4);
+      const correct = rot(flipLR(o), j);
       const pool = shuffle([0, 1, 2, 3].map(j => rot(o, j)));
       if (diff !== 'facil') pool.splice(1, 0, ...[0, 1].map(() => rot(moveMarker(flipLR(o)), rnd(4))));
       const wr = pickDistinct(pool, M, 3);
       return {
         cat: 'volteos', kind: 'fig',
-        prompt: '¿Cuál es la figura <b>volteada</b> (en espejo)?',
+        prompt: '¿Cuál es la figura <b>volteada</b>? <small class="hint">(como si le dieras la vuelta a la ficha: queda en espejo, y puede estar además girada)</small>',
         figHtml: ref(o, 'Figura original'),
         options: figOpts(correct, wr, size),
-        explain: 'La volteada es un reflejo: ningún giro de la original coincide con ella. Las demás son la original girada.',
+        explain: `Es la original <b>${describe('x', j)}</b>. Las demás son la original solo girada: esas no están volteadas.`,
+        ...anim(o, size, 'x', j),
       };
     }
     if (t === 1) {
@@ -159,7 +173,7 @@ const Fig = (() => {
         cat: 'volteos', kind: 'fig',
         prompt: 'Tres son la misma figura girada. <b>¿Cuál está volteada?</b>',
         options: figOpts(rot(flipLR(o), rnd(4)), ks.map(k => rot(o, k)), size),
-        explain: 'Gira mentalmente cada figura hasta alinearlas: la intrusa queda como en un espejo.',
+        explain: 'Gira mentalmente cada figura hasta que coincidan: tres encajan, pero la volteada queda como en un espejo y nunca encaja.',
       };
     }
     // Volteo respecto a un eje concreto
@@ -169,12 +183,13 @@ const Fig = (() => {
     const wr = pickDistinct([other, rot(o, 2), rot(o, 1), rot(o, 3)], [key(correct)], 3);
     return {
       cat: 'volteos', kind: 'fig',
-      prompt: lr ? 'Volteamos la figura de <b>izquierda a derecha</b> ⇆ (espejo vertical). ¿Cómo queda?'
-                 : 'Volteamos la figura de <b>arriba a abajo</b> ⇅ (reflejo en el agua). ¿Cómo queda?',
+      prompt: lr ? 'Le damos la vuelta a la figura de <b>izquierda a derecha</b> ⇆ <small class="hint">(como al mirarla en un espejo)</small>. ¿Cómo queda?'
+                 : 'Le damos la vuelta a la figura de <b>arriba a abajo</b> ⇅ <small class="hint">(como su reflejo en el agua)</small>. ¿Cómo queda?',
       figHtml: ref(o, 'Figura original'),
       options: figOpts(correct, wr, size),
       explain: lr ? 'Lo que estaba a la izquierda pasa a la derecha; arriba y abajo no cambian.'
                   : 'Lo que estaba arriba pasa abajo; izquierda y derecha no cambian.',
+      ...anim(o, size, lr ? 'x' : 'y', 0),
     };
   }
 

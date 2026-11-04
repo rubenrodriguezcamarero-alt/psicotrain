@@ -112,6 +112,18 @@ function animo(texto) {
 }
 function nuevaFraseInicio() { $('#motivText').textContent = frase('inicio'); }
 
+// Anima la figura original hasta convertirla en la respuesta correcta:
+// primero se da la vuelta (si es un volteo) y después gira.
+function demo({ flip, deg }) {
+  const el = document.querySelector('#demoFig svg');
+  if (!el || !el.animate) return;
+  const f = flip === 'x' ? 'scaleX(-1)' : flip === 'y' ? 'scaleY(-1)' : 'scale(1)';
+  const frames = [{ transform: 'rotate(0deg) scale(1)' }];
+  if (flip) frames.push({ transform: `rotate(0deg) ${f}`, offset: deg ? .45 : 1 });
+  if (deg || !flip) frames.push({ transform: `rotate(${deg}deg) ${f}` });
+  el.animate(frames, { duration: deg && flip ? 1800 : 1100, delay: 250, easing: 'ease-in-out', fill: 'forwards' });
+}
+
 // ---------------- Navegación ----------------
 function show(id) {
   $$('.view').forEach(v => v.classList.toggle('active', v.id === id));
@@ -236,7 +248,10 @@ function answer(i) {
   const fb = $('#feedback');
   fb.classList.add('show', ok ? 'good' : 'wrong');
   $('#fbTitle').textContent = ok ? pick(['¡Correcto! 🎉', '¡Genial! ✨', '¡Bien hecho! 💪', '¡Eso es! 🚀']) : i < 0 ? '⏰ ¡Se acabó el tiempo!' : 'Incorrecto 😬';
-  $('#fbText').innerHTML = q.explain + raeLink(q.rae);
+  $('#fbText').innerHTML = q.anim
+    ? `<span class="demo"><span class="demofig" id="demoFig" title="Toca para repetir">${q.origHtml}</span><span>${q.explain}<br><small class="replay">Toca la figura para verlo otra vez</small></span></span>`
+    : q.explain + raeLink(q.rae);
+  if (q.anim) { demo(q.anim); $('#demoFig').onclick = () => demo(q.anim); }
   $('#btnNext').textContent = Q.i + 1 < Q.list.length ? 'Siguiente ➜' : 'Ver resultados 🏁';
   // Deja visibles las opciones por encima del panel de respuesta
   requestAnimationFrame(() => {
