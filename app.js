@@ -111,8 +111,8 @@ const nombre = () => {
   if (ap.length && (!n || Math.random() < .4)) return pick(ap);
   return n;
 };
-function frase(tipo, vars = {}) {
-  const src = tipo === '_carita' ? CARITA_TXT : MOTIVA[tipo];
+function frase(tipo, vars = {}, lista) {
+  const src = lista || MOTIVA[tipo];
   let f = Array.isArray(src) ? pick(src) : src;
   for (const [k, v] of Object.entries(vars)) f = f.split('{' + k + '}').join(v);
   const n = nombre();
@@ -314,9 +314,24 @@ const CARITA_TXT = [
   'Respira, ríete un poco… ¡y a por la siguiente! 😂',
   'Esta cara no te pega nada, {n}. ¡Vamos! 💪',
 ];
+// Las fotos se van alternando; la lágrima cae desde el ojo de cada una (posición en % de la foto)
+const CARAS = [
+  { src: 'assets/cara.jpg', ojo: [29, 43], txt: CARITA_TXT },
+  { src: 'assets/cara2.jpg', ojo: [60, 54], txt: [
+    'Hasta el perro está decepcionado… 🐶',
+    'Así te miramos cuando fallas tres seguidas, {n} 😒🐶',
+    '¡Tres seguidas! El perro dice que así no vamos al Metro 🐶🚇',
+    'Nosotros dos esperando a que aciertes la siguiente… 😑🐶',
+    '{n}, ¡que hasta el perro sabe cuál era! 🐶😂',
+  ] },
+];
 function carita() {
   const el = $('#carita');
-  $('#caritaTxt').textContent = frase('_carita');
+  const i = DB.cara = ((DB.cara ?? -1) + 1) % CARAS.length; save();
+  const c = CARAS[i];
+  $('#caritaImg').src = c.src;
+  $('#caritaTear').style.left = c.ojo[0] + '%'; $('#caritaTear').style.top = c.ojo[1] + '%';
+  $('#caritaTxt').textContent = frase('_carita', {}, c.txt);
   el.hidden = false;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   sfx.trombon();

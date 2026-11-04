@@ -372,7 +372,8 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 }
 .carita.show .carita-card { animation: caritaIn .7s cubic-bezier(.2, 1.6, .4, 1) forwards, caritaWobble 1.4s .7s ease-in-out infinite; }
 .carita-img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 18px; display: block; }
-.carita-lagrima { position: absolute; left: 29%; top: 29%; font-size: 30px; opacity: 0; }
+.carita-foto { position: relative; }
+.carita-lagrima { position: absolute; left: 29%; top: 43%; margin: -6px 0 0 -12px; font-size: 26px; opacity: 0; pointer-events: none; }
 .carita.show .carita-lagrima { animation: lagrima 1.6s .9s ease-in infinite; }
 .carita-card p { margin: 12px 4px 4px; font-size: 21px; font-weight: 800; line-height: 1.3; text-wrap: balance; }
 .carita-card small { color: var(--muted); font-size: 13px; }
