@@ -18,7 +18,7 @@ const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 
 // ---------------- Almacenamiento ----------------
 const KEY = 'psicotrain.v1';
-const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'media', auto: 1, fx: 1, theme: 'auto' }, stats: {}, days: [], errors: {} });
+const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'media', auto: 1, fx: 1, theme: 'auto', name: 'Lorena' }, stats: {}, days: [], errors: {} });
 let DB = (() => {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
@@ -87,6 +87,25 @@ function makeQuestion(cat, idx) {
 // Enlace a la definición en el diccionario oficial de la RAE (dle.rae.es)
 const raeLink = w => w ? ` <a class="rae" href="https://dle.rae.es/${encodeURIComponent(w)}" target="_blank" rel="noopener">📖 «${w}» en la RAE</a>` : '';
 
+// ---------------- Ánimo ----------------
+const nombre = () => (DB.settings.name || '').trim();
+function frase(tipo, vars = {}) {
+  let f = Array.isArray(MOTIVA[tipo]) ? pick(MOTIVA[tipo]) : MOTIVA[tipo];
+  for (const [k, v] of Object.entries(vars)) f = f.split('{' + k + '}').join(v);
+  const n = nombre();
+  // Sin nombre, quita el vocativo («, {n}» / «{n}, ») para que la frase siga leyéndose bien
+  if (!n) f = f.replace(/,\s*\{n\}/g, '').replace(/\{n\},\s*/g, '').replace(/\{n\}/g, '');
+  else f = f.split('{n}').join(n);
+  return f.charAt(0).toUpperCase() + f.slice(1);
+}
+function animo(texto) {
+  const el = $('#cheer');
+  el.textContent = texto;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(animo.t); animo.t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+function nuevaFraseInicio() { $('#motivText').textContent = frase('inicio'); }
+
 // ---------------- Navegación ----------------
 function show(id) {
   $$('.view').forEach(v => v.classList.toggle('active', v.id === id));
@@ -106,7 +125,11 @@ function errCount() { return Object.values(DB.errors).reduce((a, l) => a + l.len
 
 function renderHome() {
   const h = new Date().getHours();
-  $('#hello').textContent = h < 6 ? '¡Buenas noches! 🌙' : h < 14 ? '¡Buenos días! ☀️' : h < 21 ? '¡Buenas tardes! 👋' : '¡Buenas noches! 🌙';
+  const nom = nombre();
+  const saludo = h < 6 ? 'Buenas noches' : h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches';
+  $('#hello').textContent = `¡${saludo}${nom ? ', ' + nom : ''}! ${h >= 6 && h < 14 ? '☀️' : h >= 6 && h < 21 ? '👋' : '🌙'}`;
+  const st = streak();
+  $('#motivText').textContent = st >= 3 && Math.random() < .5 ? frase('dias', { d: st }) : frase('inicio');
   let ok = 0, n = 0;
   Object.values(DB.stats).forEach(s => { ok += s.ok; n += s.n; });
   $('#stStreak').textContent = streak();
@@ -142,7 +165,7 @@ function startQuiz(cats, mode = 'normal') {
     for (let k = 0; k < n; k++) seq.push(cats[k % cats.length]);
     list = shuffle(seq).map(c => makeQuestion(c));
   }
-  Q = { cats, mode, list, i: 0, res: [], start: Date.now(),
+  Q = { cats, mode, list, i: 0, res: [], start: Date.now(), racha: 0, fallosSeguidos: 0, ultimoAnimo: -9,
         examEnd: mode === 'exam' ? Date.now() + 8 * 60 * 1000 : 0 };
   show('quiz');
   renderQuestion();
@@ -218,6 +241,14 @@ function answer(i) {
     if (over > 0) window.scrollTo({ top: scrollY + over, behavior: 'smooth' });
   });
   if (ok && DB.settings.auto == 1) advanceT = setTimeout(next, 1100);
+  // Mensajes de ánimo de vez en cuando (como mucho uno cada 3 preguntas)
+  Q.racha = ok ? Q.racha + 1 : 0;
+  Q.fallosSeguidos = ok ? 0 : Q.fallosSeguidos + 1;
+  let msg = '';
+  if (ok && [3, 6, 10, 15, 20].includes(Q.racha)) msg = frase('racha', { k: Q.racha });
+  else if (Q.fallosSeguidos === 2) msg = frase('fallos');
+  else if (Q.list.length >= 10 && Q.i + 1 === Math.floor(Q.list.length / 2)) msg = frase('mitad');
+  if (msg && Q.i - Q.ultimoAnimo >= 3) { Q.ultimoAnimo = Q.i; setTimeout(() => animo(msg), 350); }
 }
 
 function record(q, ok) {
@@ -243,6 +274,7 @@ function next() {
 
 function finish(timeUp) {
   clearInterval(tick); clearTimeout(advanceT);
+  clearTimeout(animo.t); $('#cheer').classList.remove('show');
   $('#feedback').classList.remove('show');
   const total = Q.list.length;
   const okN = Q.res.filter(r => r.ok).length;
@@ -260,6 +292,7 @@ function finish(timeUp) {
   const [title, emoji] = pct >= 90 ? ['¡Espectacular!', '🏆'] : pct >= 70 ? ['¡Muy bien!', '🌟'] : pct >= 50 ? ['Vas por buen camino', '💪'] : ['¡A seguir entrenando!', '📚'];
   $('#resTitle').textContent = `${title} ${emoji}`;
   $('#resSub').textContent = `${timeUp ? '⏰ Tiempo agotado · ' : ''}${Math.floor(secs / 60)} min ${secs % 60} s · Los fallos restan ⅓`;
+  $('#resMotiv').textContent = frase(pct >= 75 ? 'alto' : pct >= 50 ? 'medio' : 'bajo');
   let shown = 0;
   const ring = $('#ringVal');
   ring.style.transition = 'none'; ring.style.strokeDashoffset = 414.7;
@@ -329,6 +362,7 @@ function applyTheme() {
   document.querySelector('meta[name=theme-color]').content = dark ? '#0b0f24' : '#f4f2ff';
 }
 function renderSettings() {
+  $('#nameInput').value = DB.settings.name || '';
   $$('.seg').forEach(seg => {
     const k = seg.dataset.key;
     [...seg.children].forEach(b => b.classList.toggle('on', String(DB.settings[k]) === b.dataset.v));
@@ -358,11 +392,13 @@ $('#btnMix').onclick = () => startQuiz(CATS.map(c => c.id));
 $('#btnReview').onclick = () => startQuiz(VERBAL, 'review');
 $('#btnNext').onclick = next;
 $('#btnQuit').onclick = () => {
-  clearInterval(tick); clearTimeout(advanceT); $('#feedback').classList.remove('show'); Q = null; renderHome(); show('home');
+  clearInterval(tick); clearTimeout(advanceT); $('#cheer').classList.remove('show'); $('#feedback').classList.remove('show'); Q = null; renderHome(); show('home');
 };
 $('#btnAgain').onclick = () => startQuiz(Q.cats, Q.mode === 'review' && !errCount() ? 'normal' : Q.mode);
 $('#btnHome').onclick = () => { Q = null; renderHome(); show('home'); };
 $('#btnSettings').onclick = () => openSheet(true);
+$('#nameInput').addEventListener('input', e => { DB.settings.name = e.target.value.slice(0, 30); save(); renderHome(); });
+$('#motiv').onclick = nuevaFraseInicio;
 $('#btnClose').onclick = $('#overlay').onclick = () => openSheet(false);
 $('#btnReset').onclick = () => {
   const b = $('#btnReset');

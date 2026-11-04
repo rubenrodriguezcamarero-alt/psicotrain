@@ -281,3 +281,27 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .rae { display: inline-block; margin-top: 6px; font-size: 13.5px; font-weight: 700; color: var(--accent); text-decoration: none;
   padding: 4px 10px; border-radius: 99px; background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .rv .rae { display: table; margin-top: 6px; }
+
+/* ---------- Ánimo ---------- */
+.motiv {
+  width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; margin-bottom: 18px;
+  padding: 14px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--line);
+  border-left: 4px solid #e3001b; box-shadow: inset 4px 0 0 #1d4fb5;
+}
+.motiv-em { font-size: 26px; flex: none; }
+.motiv-t { font-size: 15px; line-height: 1.4; font-weight: 600; min-width: 0; }
+.motiv:active { transform: scale(.98); }
+.res-motiv { margin: 12px auto 0 !important; max-width: 34ch; color: var(--text) !important; font-weight: 700; font-size: 16px; line-height: 1.4; }
+.txt {
+  width: 100%; font: inherit; font-size: 16px; font-weight: 700; color: var(--text); padding: 12px 14px;
+  border-radius: 14px; background: var(--card); border: 1px solid var(--line); outline: none;
+}
+.txt:focus { border-color: var(--accent); }
+.cheer {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 74px); z-index: 25; width: max-content;
+  max-width: calc(100% - 32px); transform: translate(-50%, -20px) scale(.95); opacity: 0; pointer-events: none;
+  padding: 12px 18px; border-radius: 18px; color: #fff; font-weight: 800; font-size: 15.5px; text-align: center; line-height: 1.35;
+  background: linear-gradient(135deg, #e3001b, #a3247d 50%, #1d4fb5); box-shadow: 0 12px 30px -8px rgba(29, 79, 181, .6);
+  transition: transform .35s cubic-bezier(.2, .9, .3, 1.3), opacity .3s;
+}
+.cheer.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
