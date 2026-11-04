@@ -1,6 +1,6 @@
 // Service worker: permite usar la app sin conexión.
-const CACHE = 'psicotrain-v11';
-const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'data.js', 'figures.js', 'motivacion.js', 'manifest.webmanifest',
+const CACHE = 'psicotrain-v12';
+const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'data.js', 'figures.js', 'spatial.js', 'motivacion.js', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

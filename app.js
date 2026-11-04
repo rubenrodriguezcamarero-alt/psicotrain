@@ -7,6 +7,11 @@ const pick = a => a[Math.floor(Math.random() * a.length)];
 const CATS = [
   { id: 'giros', name: 'Giros', em: '🔄', desc: 'Rotaciones de figuras', c1: '#8b5cf6', c2: '#3b82f6', g: 'spatial' },
   { id: 'volteos', name: 'Volteos', em: '🪞', desc: 'Imágenes en espejo', c1: '#ec4899', c2: '#f97316', g: 'spatial' },
+  { id: 'desarrollos', name: 'Cubos desplegados', em: '🎲', desc: 'Monta el cubo', c1: '#f59e0b', c2: '#d946ef', g: 'spatial' },
+  { id: 'contar', name: 'Contar cubos', em: '🧊', desc: '¿Cuántos hay?', c1: '#06b6d4', c2: '#2563eb', g: 'spatial' },
+  { id: 'vistas', name: 'Vistas', em: '👁️', desc: 'Desde arriba', c1: '#84cc16', c2: '#059669', g: 'spatial' },
+  { id: 'papel', name: 'Papel plegado', em: '📄', desc: 'Dobla y perfora', c1: '#fb7185', c2: '#9333ea', g: 'spatial' },
+  { id: 'encajar', name: 'Encajar piezas', em: '🔲', desc: 'Completa el hueco', c1: '#475569', c2: '#7c3aed', g: 'spatial', wide: true },
   { id: 'sinonimos', name: 'Sinónimos', em: '🤝', desc: 'Mismo significado', c1: '#14b8a6', c2: '#0284c7', g: 'verbal' },
   { id: 'antonimos', name: 'Antónimos', em: '⚖️', desc: 'Significado opuesto', c1: '#f43f5e', c2: '#f59e0b', g: 'verbal' },
   { id: 'gentilicios', name: 'Gentilicios', em: '🌍', desc: '¿De dónde es?', c1: '#16a34a', c2: '#0d9488', g: 'verbal' },
@@ -16,6 +21,7 @@ const CATS = [
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
+const ESPACIAL = CATS.filter(c => c.g === 'spatial').map(c => c.id);
 
 // ---------------- Almacenamiento ----------------
 const KEY = 'psicotrain.v1';
@@ -42,6 +48,7 @@ const opt = (t, ok) => ({ t, ok: !!ok });
 function makeQuestion(cat, idx) {
   if (cat === 'giros') return Fig.giro(DB.settings.diff);
   if (cat === 'volteos') return Fig.volteo(DB.settings.diff);
+  if (Spatial[cat]) return Spatial[cat](DB.settings.diff);
   const L = DATA[cat];
   const i = idx ?? draw(cat, L.length);
   const p = L[i].split('|');
@@ -192,7 +199,7 @@ function startQuiz(cats, mode = 'normal') {
     // Como el examen real: bloque verbal (20) y bloque espacial (20), 40 minutos, los fallos restan ⅓
     const bloque = (cats, nombre) => shuffle(Array.from({ length: 20 }, (_, k) => cats[k % cats.length]))
       .map(c => ({ lazy: c, block: nombre }));
-    list = [...bloque(VERBAL, 'verbal'), ...bloque(['giros', 'volteos'], 'espacial')];
+    list = [...bloque(VERBAL, 'verbal'), ...bloque(ESPACIAL, 'espacial')];
   } else {
     const seq = [];
     for (let k = 0; k < n; k++) seq.push(cats[k % cats.length]);

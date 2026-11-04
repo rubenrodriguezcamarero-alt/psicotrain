@@ -334,3 +334,27 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .figsvg .f1 { fill: var(--cube-t); }
 .figsvg .f2 { fill: var(--cube-r); }
 .figsvg .f3 { fill: var(--cube-l); }
+
+/* ---------- Más ejercicios espaciales ---------- */
+:root { --sym: #3b0764; --paper: #fef3c7; --paper-edge: #b45309; --hole: #1e1b4b; }
+.reffig.big { width: 168px; height: 168px; }
+.reffig.sm { width: 84px; height: 84px; padding: 4px; }
+.steps { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
+.steps .arrow { font-size: 18px; }
+.inl { display: inline-block; width: 1.7em; height: 1.7em; vertical-align: middle; }
+.figsvg .d1 { fill: #f5f3ff; } .figsvg .d2 { fill: #ddd6fe; } .figsvg .d3 { fill: #c4b5fd; }
+.figsvg .d1, .figsvg .d2, .figsvg .d3 { stroke: var(--cube-edge); stroke-width: .035; }
+.figsvg .nc { stroke-width: .03; }
+.figsvg .sy { fill: var(--sym); }
+.figsvg .sy-o { fill: none; stroke: var(--sym); stroke-width: .07; }
+.figsvg .sy-l { fill: none; stroke: var(--sym); stroke-width: .09; stroke-linecap: round; }
+.figsvg .pgh { fill: none; stroke: var(--muted); stroke-width: .04; stroke-dasharray: .12 .1; }
+.figsvg .pp { fill: var(--paper); stroke: var(--paper-edge); stroke-width: .03; }
+.figsvg .pf { stroke: var(--fig-m); stroke-width: .07; stroke-dasharray: .2 .12; }
+.figsvg .pa { stroke: var(--fig-m); stroke-width: .09; }
+.figsvg .pah { fill: var(--fig-m); }
+.figsvg .ph { fill: var(--hole); }
+.figsvg .bd { fill: var(--fig); }
+.figsvg .bh { fill: none; stroke: var(--fig-m); stroke-width: .06; stroke-dasharray: .14 .1; }
+.figsvg .fl { fill: color-mix(in srgb, var(--fig) 18%, transparent); stroke: var(--muted); stroke-width: .03; }
+.figsvg .fll { stroke: var(--muted); stroke-width: .02; opacity: .7; }
