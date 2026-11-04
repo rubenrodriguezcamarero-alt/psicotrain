@@ -112,7 +112,8 @@ const nombre = () => {
   return n;
 };
 function frase(tipo, vars = {}) {
-  let f = Array.isArray(MOTIVA[tipo]) ? pick(MOTIVA[tipo]) : MOTIVA[tipo];
+  const src = tipo === '_carita' ? CARITA_TXT : MOTIVA[tipo];
+  let f = Array.isArray(src) ? pick(src) : src;
   for (const [k, v] of Object.entries(vars)) f = f.split('{' + k + '}').join(v);
   const n = nombre();
   // Sin nombre, quita el vocativo («, {n}» / «{n}, ») para que la frase siga leyéndose bien
@@ -299,8 +300,29 @@ function answer(i) {
   if (ok && [3, 6, 10, 15, 20].includes(Q.racha)) msg = frase('racha', { k: Q.racha });
   else if (Q.fallosSeguidos === 2) msg = frase('fallos');
   else if (Q.list.length >= 10 && Q.i + 1 === Math.floor(Q.list.length / 2)) msg = frase('mitad');
+  // Tres fallos seguidos (y seis, nueve…): sale la foto con cara de pena
+  if (!ok && Q.fallosSeguidos % 3 === 0) { setTimeout(carita, 450); return; }
   if (msg && Q.i - Q.ultimoAnimo >= 3) { Q.ultimoAnimo = Q.i; setTimeout(() => animo(msg), 350); }
 }
+
+// ---------------- La carita (3 fallos seguidos) ----------------
+const CARITA_TXT = [
+  '¡Tres seguidas! Esta es la cara que se nos queda… 😝',
+  '¡Ay, {n}! Con esta cara no se aprueba 🙈',
+  'Tres fallos seguidos… ¡pero seguro que esta cara te anima! 😜',
+  '¡{n}, despierta! Que nos vamos al Metro 🚇😝',
+  'Respira, ríete un poco… ¡y a por la siguiente! 😂',
+  'Esta cara no te pega nada, {n}. ¡Vamos! 💪',
+];
+function carita() {
+  const el = $('#carita');
+  $('#caritaTxt').textContent = frase('_carita');
+  el.hidden = false;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  sfx.trombon();
+  clearTimeout(carita.t); carita.t = setTimeout(cerrarCarita, 4500);
+}
+function cerrarCarita() { clearTimeout(carita.t); const el = $('#carita'); el.classList.remove('show'); setTimeout(() => { el.hidden = true; }, 300); }
 
 function record(q, ok) {
   const s = DB.stats[q.cat] || (DB.stats[q.cat] = { ok: 0, n: 0 });
@@ -393,6 +415,8 @@ const sfx = (() => {
     unlock() { try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); ctx.resume(); } catch (e) {} },
     ok() { tone(660, .12); tone(990, .18, 'sine', .09); vib(15); },
     bad() { tone(200, .25, 'triangle'); vib([40, 50, 40]); },
+    // «Wah, wah, wah, waaah» de trombón triste
+    trombon() { [[392, 0], [370, .32], [349, .64], [330, .96]].forEach(([f, t], i) => tone(f, i === 3 ? .9 : .3, 'sawtooth', t, .07)); vib([60, 80, 60, 80, 200]); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .25, 'sine', i * .1)); },
   };
 })();
@@ -465,6 +489,7 @@ $('#btnSettings').onclick = () => openSheet(true);
 $('#nameInput').addEventListener('input', e => { DB.settings.name = e.target.value.slice(0, 30); save(); renderHome(); });
 $('#apodosInput').addEventListener('input', e => { DB.settings.apodos = e.target.value.slice(0, 200); save(); });
 $('#motiv').onclick = nuevaFraseInicio;
+$('#carita').onclick = cerrarCarita;
 $('#cheer').onclick = () => { clearTimeout(animo.t); $('#cheer').classList.remove('show'); }; // tocar para cerrarlo
 $('#btnClose').onclick = $('#overlay').onclick = () => openSheet(false);
 $('#btnReset').onclick = () => {
