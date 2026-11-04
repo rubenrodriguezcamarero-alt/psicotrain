@@ -324,3 +324,13 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .blk span { grid-column: 1; color: var(--muted); font-size: 13px; }
 .blk strong { grid-column: 2; grid-row: 1 / span 2; font-size: 26px; font-variant-numeric: tabular-nums; }
 .blk.total { border-color: var(--accent); }
+
+/* ---------- Polígonos y piezas 3D ---------- */
+:root { --cube-t: #ddd6fe; --cube-r: #8b5cf6; --cube-l: #6d28d9; --cube-edge: #2e1065; }
+.figsvg .pg { fill: var(--fig); stroke: var(--fig-stroke); stroke-width: .03; stroke-linejoin: round; }
+.figsvg .pl { stroke: var(--fig-m); stroke-width: .09; stroke-linecap: round; }
+.figsvg .pd { fill: var(--dot); stroke: var(--fig-m); stroke-width: .035; }
+.figsvg .f1, .figsvg .f2, .figsvg .f3 { stroke: var(--cube-edge); stroke-width: .05; stroke-linejoin: round; }
+.figsvg .f1 { fill: var(--cube-t); }
+.figsvg .f2 { fill: var(--cube-r); }
+.figsvg .f3 { fill: var(--cube-l); }

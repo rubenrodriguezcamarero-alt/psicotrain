@@ -181,6 +181,7 @@ let Q = null, tick = null, advanceT = null;
 
 function startQuiz(cats, mode = 'normal') {
   sfx.unlock();
+  clearTimeout(animo.t); $('#cheer').classList.remove('show');
   let list;
   const n = DB.settings.count;
   if (mode === 'review') {
@@ -190,12 +191,12 @@ function startQuiz(cats, mode = 'normal') {
   } else if (mode === 'exam') {
     // Como el examen real: bloque verbal (20) y bloque espacial (20), 40 minutos, los fallos restan ⅓
     const bloque = (cats, nombre) => shuffle(Array.from({ length: 20 }, (_, k) => cats[k % cats.length]))
-      .map(c => ({ ...makeQuestion(c), block: nombre }));
+      .map(c => ({ lazy: c, block: nombre }));
     list = [...bloque(VERBAL, 'verbal'), ...bloque(['giros', 'volteos'], 'espacial')];
   } else {
     const seq = [];
     for (let k = 0; k < n; k++) seq.push(cats[k % cats.length]);
-    list = shuffle(seq).map(c => makeQuestion(c));
+    list = shuffle(seq).map(c => ({ lazy: c })); // cada pregunta se genera al mostrarla
   }
   Q = { cats, mode, list, i: 0, res: [], start: Date.now(), racha: 0, fallosSeguidos: 0, ultimoAnimo: -9,
         examEnd: mode === 'exam' ? Date.now() + 40 * 60 * 1000 : 0 };
@@ -205,6 +206,8 @@ function startQuiz(cats, mode = 'normal') {
 
 function renderQuestion() {
   clearTimeout(advanceT);
+  const pend = Q.list[Q.i];
+  if (pend.lazy) Q.list[Q.i] = { ...makeQuestion(pend.lazy), block: pend.block };
   const q = Q.list[Q.i], c = CAT[q.cat];
   const quiz = $('#quiz');
   quiz.style.setProperty('--c1', c.c1); quiz.style.setProperty('--c2', c.c2);
@@ -213,7 +216,8 @@ function renderQuestion() {
     const ini = Q.list.findIndex(x => x.block === q.block);
     const tot = Q.list.filter(x => x.block === q.block).length;
     $('#qCount').textContent = `${q.block === 'verbal' ? 'Verbal' : 'Espacial'} ${Q.i - ini + 1}/${tot}`;
-    if (Q.i === ini) setTimeout(() => animo(q.block === 'verbal' ? 'Bloque 1 de 2: razonamiento verbal 📚' : 'Bloque 2 de 2: razonamiento espacial 🧩 ¡A por ello!'), 300);
+    const esteTest = Q;
+    if (Q.i === ini) setTimeout(() => Q === esteTest && animo(q.block === 'verbal' ? 'Bloque 1 de 2: razonamiento verbal 📚' : 'Bloque 2 de 2: razonamiento espacial 🧩 ¡A por ello!'), 300);
   } else $('#qCount').textContent = `${Q.i + 1} / ${Q.list.length}`;
   $('#prog').style.width = `${100 * Q.i / Q.list.length}%`;
   $('#qPrompt').innerHTML = q.prompt;
