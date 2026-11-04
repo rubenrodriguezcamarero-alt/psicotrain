@@ -1,5 +1,5 @@
 // Service worker: permite usar la app sin conexión.
-const CACHE = 'psicotrain-v14';
+const CACHE = 'psicotrain-v15';
 const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'data.js', 'figures.js', 'spatial.js', 'motivacion.js', 'assets/cara.jpg', 'assets/cara2.jpg', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 
@@ -10,12 +10,17 @@ self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
-// Responde desde caché al instante y actualiza en segundo plano
+// Con conexión, siempre la versión más reciente (así las mejoras llegan al momento);
+// sin conexión, lo que haya guardado.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(caches.open(CACHE).then(async cache => {
-    const hit = await cache.match(e.request, { ignoreSearch: true });
-    const net = fetch(e.request).then(r => { if (r.ok) cache.put(e.request, r.clone()); return r; }).catch(() => hit);
-    return hit || net;
+    try {
+      const r = await fetch(e.request, { cache: 'no-cache' });
+      if (r.ok) cache.put(e.request, r.clone());
+      return r;
+    } catch (err) {
+      return (await cache.match(e.request, { ignoreSearch: true })) || Response.error();
+    }
   }));
 });
