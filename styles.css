@@ -315,3 +315,12 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 }
 .demofig svg { transform-origin: 50% 50%; }
 .replay { color: var(--muted); font-size: 12px; }
+
+/* ---------- Simulacro por bloques ---------- */
+.blocks { display: grid; gap: 8px; margin-bottom: 8px; }
+.blk { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 12px; padding: 12px 14px;
+  border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.blk b { font-size: 15px; }
+.blk span { grid-column: 1; color: var(--muted); font-size: 13px; }
+.blk strong { grid-column: 2; grid-row: 1 / span 2; font-size: 26px; font-variant-numeric: tabular-nums; }
+.blk.total { border-color: var(--accent); }

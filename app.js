@@ -11,14 +11,15 @@ const CATS = [
   { id: 'antonimos', name: 'Antónimos', em: '⚖️', desc: 'Significado opuesto', c1: '#f43f5e', c2: '#f59e0b', g: 'verbal' },
   { id: 'gentilicios', name: 'Gentilicios', em: '🌍', desc: '¿De dónde es?', c1: '#16a34a', c2: '#0d9488', g: 'verbal' },
   { id: 'ortografia', name: 'Ortografía', em: '✍️', desc: 'Caza la falta', c1: '#f59e0b', c2: '#e11d48', g: 'verbal' },
-  { id: 'analogias', name: 'Analogías', em: '🧩', desc: 'A es a B como…', c1: '#6366f1', c2: '#c026d3', g: 'verbal', wide: true },
+  { id: 'analogias', name: 'Analogías', em: '🧩', desc: 'A es a B como…', c1: '#6366f1', c2: '#c026d3', g: 'verbal' },
+  { id: 'intrusa', name: 'Palabra intrusa', em: '🔍', desc: '¿Cuál no encaja?', c1: '#0ea5e9', c2: '#7c3aed', g: 'verbal' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 
 // ---------------- Almacenamiento ----------------
 const KEY = 'psicotrain.v1';
-const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'media', auto: 1, fx: 1, theme: 'auto', name: 'Lorena', apodos: 'Amparito, Pequeña, Amparo, Perrangana, Cuchifrita' }, stats: {}, days: [], errors: {} });
+const DEFAULTS = () => ({ settings: { count: 10, time: 0, diff: 'examen', auto: 1, fx: 1, theme: 'auto', name: 'Lorena', apodos: 'Amparito, Pequeña, Amparo, Perrangana, Cuchifrita' }, stats: {}, days: [], errors: {} });
 let DB = (() => {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
@@ -26,6 +27,8 @@ let DB = (() => {
   } catch (e) {}
   return DEFAULTS();
 })();
+// Migración: quien tenía la dificultad media pasa al nivel examen (People Experts tiene nivel alto)
+if (!DB.v) { if (DB.settings.diff === 'media') DB.settings.diff = 'examen'; DB.v = 2; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} };
 
 // ---------------- Generación de preguntas ----------------
@@ -74,6 +77,12 @@ function makeQuestion(cat, idx) {
       return { ...base, prompt: '¿Qué palabra tiene una <b>falta de ortografía</b>?', word: '',
         options: shuffle([opt(b, 1), ...goods.map(g => opt(g))]),
         explain: `<b>${b}</b> está mal: se escribe <b>${ok}</b>.`, review: `${b} ✗ → ${ok}`, rae: ok };
+    }
+    case 'intrusa': {
+      const [intr, a, b, c, comun] = p;
+      return { ...base, prompt: '¿Qué palabra <b>no encaja</b> con las demás?', word: '',
+        options: shuffle([opt(intr, 1), opt(a), opt(b), opt(c)]),
+        explain: `<b>${intr}</b> es la intrusa: las demás son ${comun}.`, review: `${intr} (las demás: ${comun})`, rae: /^[a-záéíóúñ]+$/.test(intr) ? intr : '' };
     }
     case 'analogias': {
       const [a, b, c, ok, ...ds] = p;
@@ -173,18 +182,23 @@ let Q = null, tick = null, advanceT = null;
 function startQuiz(cats, mode = 'normal') {
   sfx.unlock();
   let list;
-  const n = mode === 'exam' ? 20 : DB.settings.count;
+  const n = DB.settings.count;
   if (mode === 'review') {
     const items = [];
     for (const [c, ids] of Object.entries(DB.errors)) ids.forEach(id => items.push([c, id]));
     list = shuffle(items).slice(0, n).map(([c, id]) => makeQuestion(c, id));
+  } else if (mode === 'exam') {
+    // Como el examen real: bloque verbal (20) y bloque espacial (20), 40 minutos, los fallos restan ⅓
+    const bloque = (cats, nombre) => shuffle(Array.from({ length: 20 }, (_, k) => cats[k % cats.length]))
+      .map(c => ({ ...makeQuestion(c), block: nombre }));
+    list = [...bloque(VERBAL, 'verbal'), ...bloque(['giros', 'volteos'], 'espacial')];
   } else {
     const seq = [];
     for (let k = 0; k < n; k++) seq.push(cats[k % cats.length]);
     list = shuffle(seq).map(c => makeQuestion(c));
   }
   Q = { cats, mode, list, i: 0, res: [], start: Date.now(), racha: 0, fallosSeguidos: 0, ultimoAnimo: -9,
-        examEnd: mode === 'exam' ? Date.now() + 8 * 60 * 1000 : 0 };
+        examEnd: mode === 'exam' ? Date.now() + 40 * 60 * 1000 : 0 };
   show('quiz');
   renderQuestion();
 }
@@ -195,7 +209,12 @@ function renderQuestion() {
   const quiz = $('#quiz');
   quiz.style.setProperty('--c1', c.c1); quiz.style.setProperty('--c2', c.c2);
   $('#qTag').textContent = `${c.em} ${c.name}`;
-  $('#qCount').textContent = `${Q.i + 1} / ${Q.list.length}`;
+  if (q.block) {
+    const ini = Q.list.findIndex(x => x.block === q.block);
+    const tot = Q.list.filter(x => x.block === q.block).length;
+    $('#qCount').textContent = `${q.block === 'verbal' ? 'Verbal' : 'Espacial'} ${Q.i - ini + 1}/${tot}`;
+    if (Q.i === ini) setTimeout(() => animo(q.block === 'verbal' ? 'Bloque 1 de 2: razonamiento verbal 📚' : 'Bloque 2 de 2: razonamiento espacial 🧩 ¡A por ello!'), 300);
+  } else $('#qCount').textContent = `${Q.i + 1} / ${Q.list.length}`;
   $('#prog').style.width = `${100 * Q.i / Q.list.length}%`;
   $('#qPrompt').innerHTML = q.prompt;
   const w = $('#qWord');
@@ -313,6 +332,19 @@ function finish(timeUp) {
   const [title, emoji] = pct >= 90 ? ['¡Espectacular!', '🏆'] : pct >= 70 ? ['¡Muy bien!', '🌟'] : pct >= 50 ? ['Vas por buen camino', '💪'] : ['¡A seguir entrenando!', '📚'];
   $('#resTitle').textContent = `${title} ${emoji}`;
   $('#resSub').textContent = `${timeUp ? '⏰ Tiempo agotado · ' : ''}${Math.floor(secs / 60)} min ${secs % 60} s · Los fallos restan ⅓`;
+  const bl = $('#resBlocks');
+  if (Q.mode === 'exam') {
+    const nb = b => {
+      const r = Q.res.filter(x => x.q.block === b), t = Q.list.filter(x => x.block === b).length;
+      const ok = r.filter(x => x.ok).length, bad = r.filter(x => !x.ok && !x.blank).length;
+      return { ok, bad, blank: t - ok - bad, nota: Math.max(0, (ok - bad / 3) / t * 10) };
+    };
+    const v = nb('verbal'), e = nb('espacial'), f = x => x.toFixed(1).replace('.', ',');
+    bl.innerHTML = [['📚 Verbal', v], ['🧩 Espacial', e]].map(([t, x]) =>
+      `<div class="blk"><b>${t}</b><span>${x.ok} ✓ · ${x.bad} ✗ · ${x.blank} en blanco</span><strong>${f(x.nota)}</strong></div>`).join('')
+      + `<div class="blk total"><b>Media de los dos bloques</b><span>Así se calcula en el examen de Metro</span><strong>${f((v.nota + e.nota) / 2)}</strong></div>`;
+    bl.hidden = false;
+  } else bl.hidden = true;
   $('#resMotiv').textContent = frase(pct >= 75 ? 'alto' : pct >= 50 ? 'medio' : 'bajo');
   let shown = 0;
   const ring = $('#ringVal');
