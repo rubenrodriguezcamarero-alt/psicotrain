@@ -51,7 +51,7 @@ function makeQuestion(cat, idx) {
       return { ...base, prompt: `Elige el <b>${syn ? 'sinónimo' : 'antónimo'}</b> de`, word: w,
         options: shuffle([opt(ok, 1), ...ds.map(d => opt(d))]),
         explain: `<b>${w}</b> ${syn ? 'significa lo mismo que' : 'es lo contrario de'} <b>${ok}</b>.`,
-        review: `${w} → ${ok}` };
+        review: `${w} → ${ok}`, rae: w };
     }
     case 'gentilicios': {
       const [place, ok, ...fakes] = p;
@@ -60,20 +60,20 @@ function makeQuestion(cat, idx) {
       while (ds.length < 3) { const o = others.pop(); if (o !== ok && !ds.includes(o)) ds.push(o); }
       return { ...base, prompt: '¿Cuál es el <b>gentilicio</b> de', word: place,
         options: shuffle([opt(ok, 1), ...ds.map(d => opt(d))]),
-        explain: `Quien es de <b>${place}</b> es <b>${ok}</b>.`, review: `${place} → ${ok}` };
+        explain: `Quien es de <b>${place}</b> es <b>${ok}</b>.`, review: `${place} → ${ok}`, rae: ok };
     }
     case 'ortografia': {
       const [ok, ...bad] = p;
       if (Math.random() < .5) {
         return { ...base, prompt: '¿Qué palabra está <b>bien escrita</b>?', word: '',
           options: shuffle([opt(ok, 1), ...bad.map(b => opt(b))]),
-          explain: `Se escribe <b>${ok}</b>.`, review: `Se escribe ${ok}` };
+          explain: `Se escribe <b>${ok}</b>.`, review: `Se escribe ${ok}`, rae: ok };
       }
       const b = pick(bad);
       const goods = shuffle(L.filter((_, j) => j !== i)).slice(0, 3).map(s => s.split('|')[0]);
       return { ...base, prompt: '¿Qué palabra tiene una <b>falta de ortografía</b>?', word: '',
         options: shuffle([opt(b, 1), ...goods.map(g => opt(g))]),
-        explain: `<b>${b}</b> está mal: se escribe <b>${ok}</b>.`, review: `${b} ✗ → ${ok}` };
+        explain: `<b>${b}</b> está mal: se escribe <b>${ok}</b>.`, review: `${b} ✗ → ${ok}`, rae: ok };
     }
     case 'analogias': {
       const [a, b, c, ok, ...ds] = p;
@@ -83,6 +83,9 @@ function makeQuestion(cat, idx) {
     }
   }
 }
+
+// Enlace a la definición en el diccionario oficial de la RAE (dle.rae.es)
+const raeLink = w => w ? ` <a class="rae" href="https://dle.rae.es/${encodeURIComponent(w)}" target="_blank" rel="noopener">📖 «${w}» en la RAE</a>` : '';
 
 // ---------------- Navegación ----------------
 function show(id) {
@@ -204,7 +207,7 @@ function answer(i) {
   const fb = $('#feedback');
   fb.classList.add('show', ok ? 'good' : 'wrong');
   $('#fbTitle').textContent = ok ? pick(['¡Correcto! 🎉', '¡Genial! ✨', '¡Bien hecho! 💪', '¡Eso es! 🚀']) : i < 0 ? '⏰ ¡Se acabó el tiempo!' : 'Incorrecto 😬';
-  $('#fbText').innerHTML = q.explain;
+  $('#fbText').innerHTML = q.explain + raeLink(q.rae);
   $('#btnNext').textContent = Q.i + 1 < Q.list.length ? 'Siguiente ➜' : 'Ver resultados 🏁';
   // Deja visibles las opciones por encima del panel de respuesta
   requestAnimationFrame(() => {
@@ -274,7 +277,7 @@ function finish(timeUp) {
     const right = q.options.find(o => o.ok);
     if (q.kind === 'fig') return `<div class="rv"><div class="mini">${right.html}</div><div class="t"><small>${c.em} ${c.name}</small>${q.prompt.replace(/<[^>]+>/g, '')}<br><span class="yes">La miniatura es la solución</span></div></div>`;
     const mine = r.chosen >= 0 ? `<span class="no">${q.options[r.chosen].t}</span> · ` : '';
-    return `<div class="rv"><div class="t"><small>${c.em} ${c.name}${q.word ? ' · ' + q.word.replace(/<br>/g, ' ') : ''}</small>${mine}<span class="yes">${right.t}</span></div></div>`;
+    return `<div class="rv"><div class="t"><small>${c.em} ${c.name}${q.word ? ' · ' + q.word.replace(/<br>/g, ' ') : ''}</small>${mine}<span class="yes">${right.t}</span>${raeLink(q.rae)}</div></div>`;
   }).join('') : '<h3 style="text-align:center">¡Ni un solo fallo! 🦄</h3>';
 }
 
