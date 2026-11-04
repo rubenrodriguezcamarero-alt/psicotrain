@@ -117,7 +117,7 @@ function animo(texto) {
   const el = $('#cheer');
   el.textContent = texto;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-  clearTimeout(animo.t); animo.t = setTimeout(() => el.classList.remove('show'), 3200);
+  clearTimeout(animo.t); animo.t = setTimeout(() => el.classList.remove('show'), 4200);
 }
 function nuevaFraseInicio() { $('#motivText').textContent = frase('inicio'); }
 
@@ -458,6 +458,7 @@ $('#btnSettings').onclick = () => openSheet(true);
 $('#nameInput').addEventListener('input', e => { DB.settings.name = e.target.value.slice(0, 30); save(); renderHome(); });
 $('#apodosInput').addEventListener('input', e => { DB.settings.apodos = e.target.value.slice(0, 200); save(); });
 $('#motiv').onclick = nuevaFraseInicio;
+$('#cheer').onclick = () => { clearTimeout(animo.t); $('#cheer').classList.remove('show'); }; // tocar para cerrarlo
 $('#btnClose').onclick = $('#overlay').onclick = () => openSheet(false);
 $('#btnReset').onclick = () => {
   const b = $('#btnReset');
