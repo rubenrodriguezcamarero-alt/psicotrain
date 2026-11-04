@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PsicoTrain</title>
+  <meta name="description" content="Entrena psicotécnicos: giros, volteos y razonamiento verbal.">
+  <meta name="theme-color" content="#0b0f24">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PsicoTrain">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- INICIO -->
+  <section id="home" class="view active">
+    <div class="top">
+      <div class="brand">
+        <img src="icons/icon-192.png" alt="">
+        <div><small id="hello">¡Hola!</small><b>PsicoTrain</b></div>
+      </div>
+      <button class="icon-btn" id="btnSettings" aria-label="Ajustes">⚙️</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="stStreak">0</b><span>🔥 días seguidos</span></div>
+      <div class="stat"><b id="stAcc">–</b><span>🎯 precisión</span></div>
+      <div class="stat"><b id="stTotal">0</b><span>✅ respondidas</span></div>
+    </div>
+
+    <div class="install" id="install">
+      <span style="font-size:26px">📲</span>
+      <p id="installText">Instálala en tu pantalla de inicio para usarla como una app, incluso sin conexión.</p>
+      <button id="installBtn">Instalar</button>
+    </div>
+
+    <button class="hero" id="btnExam">
+      <h2>Simulacro de examen</h2>
+      <p>20 preguntas · 8 minutos · todo mezclado</p>
+      <span class="go">Empezar ➜</span>
+      <span class="big">🏆</span>
+    </button>
+
+    <div class="pills">
+      <button class="pill" id="btnMix">🎲 Mezcla rápida</button>
+      <button class="pill" id="btnReview" hidden>🔁 Repasar fallos <span class="n" id="nErr">0</span></button>
+    </div>
+
+    <h3 class="sec">Aptitud espacial</h3>
+    <div class="grid" id="gridSpatial"></div>
+
+    <h3 class="sec">Razonamiento verbal</h3>
+    <div class="grid" id="gridVerbal"></div>
+
+    <p class="foot">Funciona sin conexión · Tus datos se guardan solo en este dispositivo</p>
+  </section>
+
+  <!-- PREGUNTA -->
+  <section id="quiz" class="view">
+    <div class="qtop">
+      <button class="icon-btn" id="btnQuit" aria-label="Salir">✕</button>
+      <div class="progress"><i id="prog"></i></div>
+      <div class="timer" id="timer" hidden>0:00</div>
+    </div>
+    <div class="qmeta">
+      <span class="tag" id="qTag"></span>
+      <span class="count" id="qCount"></span>
+    </div>
+    <div class="qcard">
+      <p class="prompt" id="qPrompt"></p>
+      <div class="word" id="qWord"></div>
+      <div class="figwrap" id="qFig"></div>
+    </div>
+    <div class="opts" id="qOpts"></div>
+    <div class="spacer"></div>
+  </section>
+
+  <!-- RESULTADOS -->
+  <section id="results" class="view">
+    <div class="res-head">
+      <div class="ring">
+        <svg viewBox="0 0 160 160">
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+          <circle class="track" cx="80" cy="80" r="66"/>
+          <circle class="val" id="ringVal" cx="80" cy="80" r="66" stroke-dasharray="414.7" stroke-dashoffset="414.7"/>
+        </svg>
+        <div class="lbl"><div><b id="resPct">0%</b><small>aciertos</small></div></div>
+      </div>
+      <h2 id="resTitle"></h2>
+      <p id="resSub"></p>
+    </div>
+    <div class="res-stats">
+      <div class="stat"><b id="rOk" style="color:var(--ok)">0</b><span>aciertos</span></div>
+      <div class="stat"><b id="rBad" style="color:var(--bad)">0</b><span>fallos</span></div>
+      <div class="stat"><b id="rBlank">0</b><span>en blanco</span></div>
+      <div class="stat"><b id="rNota">0</b><span>nota /10</span></div>
+    </div>
+    <div class="review" id="review"></div>
+    <div class="res-btns">
+      <button class="btn" id="btnAgain">🔄 Otra vez</button>
+      <button class="btn ghost" id="btnHome">🏠 Inicio</button>
+    </div>
+  </section>
+</div>
+
+<!-- Panel de respuesta -->
+<div class="feedback" id="feedback">
+  <div class="in">
+    <h4 id="fbTitle"></h4>
+    <p id="fbText"></p>
+    <button class="btn" id="btnNext">Siguiente ➜</button>
+  </div>
+</div>
+
+<!-- Ajustes -->
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Ajustes">
+  <div class="grab"></div>
+  <h3>⚙️ Ajustes</h3>
+  <div class="field"><label>Preguntas por test</label>
+    <div class="seg" data-key="count"><button data-v="10">10</button><button data-v="20">20</button><button data-v="30">30</button></div></div>
+  <div class="field"><label>Tiempo por pregunta</label>
+    <div class="seg" data-key="time"><button data-v="0">Sin límite</button><button data-v="30">30 s</button><button data-v="15">15 s</button></div></div>
+  <div class="field"><label>Dificultad de las figuras</label>
+    <div class="seg" data-key="diff"><button data-v="facil">Fácil</button><button data-v="media">Media</button><button data-v="dificil">Difícil</button></div></div>
+  <div class="field"><label>Pasar a la siguiente al acertar</label>
+    <div class="seg" data-key="auto"><button data-v="1">Automático</button><button data-v="0">Manual</button></div></div>
+  <div class="field"><label>Sonido y vibración</label>
+    <div class="seg" data-key="fx"><button data-v="1">Activados</button><button data-v="0">Silencio</button></div></div>
+  <div class="field"><label>Tema</label>
+    <div class="seg" data-key="theme"><button data-v="auto">Auto</button><button data-v="light">Claro</button><button data-v="dark">Oscuro</button></div></div>
+  <button class="danger" id="btnReset">Borrar estadísticas</button>
+  <button class="btn" id="btnClose" style="margin-top:8px">Listo</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<script src="data.js"></script>
+<script src="figures.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
