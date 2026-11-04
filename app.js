@@ -534,7 +534,13 @@ $('#installBtn').onclick = async () => {
   $('#install').classList.remove('show');
 };
 window.addEventListener('appinstalled', () => { $('#install').classList.remove('show'); toast('¡App instalada! 🦄'); });
-if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  const habiaVersion = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  // Cuando llega una versión nueva, recarga una vez para usarla
+  let recargado = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (habiaVersion && !recargado) { recargado = true; location.reload(); } });
+}
 
 applyTheme();
 renderHome();
