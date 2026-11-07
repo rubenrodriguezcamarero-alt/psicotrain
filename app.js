@@ -21,8 +21,12 @@ const CATS = [
 ];
 // Temas del temario de la oposición (datos en temario/datos.js)
 const TEMAS = typeof TEMARIO !== 'undefined' ? TEMARIO.temas : [];
+// La copia privada añade los temas con restricciones de difusión (no están en GitHub)
+if (typeof TEMARIO_PRIVADO !== 'undefined') {
+  TEMAS.forEach(t => { const p = TEMARIO_PRIVADO.preguntas[t.id]; if (p && p.length) { TEMARIO.preguntas[t.id] = p; t.n = p.length; } });
+}
 TEMAS.forEach(t => CATS.push({ id: t.id, name: `${t.num}. ${t.name}`, em: t.em, c1: t.c1, c2: t.c2, g: 'temario',
-  desc: t.n ? `${t.n} preguntas tipo test` : 'Pendiente del PDF', off: !t.n }));
+  desc: t.n ? `${t.n} preguntas tipo test` : t.privado ? 'Solo en la versión privada' : 'Pendiente del PDF', off: !t.n }));
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 const TEMARIO_IDS = CATS.filter(c => c.g === 'temario' && !c.off).map(c => c.id);
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
