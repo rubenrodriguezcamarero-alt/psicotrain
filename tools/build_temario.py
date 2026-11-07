@@ -8,12 +8,14 @@ copia privada de claude.ai, nunca en la app pública de GitHub.
 """
 import glob, json, os
 
-PRIVADOS = {'t2', 't7'}
+# Todo el temario es el oficial que Metro publica para que lo descarguen los aspirantes:
+# no queda ningún tema reservado a la copia privada.
+PRIVADOS = set()
 
 TEMAS = [
     # id, número, nombre (como en el título del PDF), emoji, color 1, color 2
     ('t1', 1, 'Conocimientos sobre Metro', '🚇', '#e3001b', '#1d4fb5'),
-    ('t2', 2, 'NISARC', '📕', '#dc2626', '#7c2d12'),
+    ('t2', 2, 'Normas Internas Seguridad Agentes', '📕', '#dc2626', '#7c2d12'),
     ('t3', 3, 'NIC', '📘', '#2563eb', '#0f766e'),
     ('t4', 4, 'Reglamento de Viajeros Metro de Madrid', '📜', '#9333ea', '#db2777'),
     ('t5', 5, 'Código Ético Metro de Madrid', '🧭', '#0891b2', '#4f46e5'),
