@@ -14,12 +14,12 @@ PRIVADOS = set()
 
 TEMAS = [
     # id, número, nombre (como en el título del PDF), emoji, color 1, color 2
-    ('t1', 1, 'Conocimientos sobre Metro', '🚇', '#e3001b', '#1d4fb5'),
+    ('t1', 1, 'Conocimientos específicos sobre Metro de Madrid', '🚇', '#e3001b', '#1d4fb5'),
     ('t2', 2, 'Normas Internas Seguridad Agentes', '📕', '#dc2626', '#7c2d12'),
-    ('t3', 3, 'NIC', '📘', '#2563eb', '#0f766e'),
+    ('t3', 3, 'Normativa Interna de Circulación', '📘', '#2563eb', '#0f766e'),
     ('t4', 4, 'Reglamento de Viajeros Metro de Madrid', '📜', '#9333ea', '#db2777'),
     ('t5', 5, 'Código Ético Metro de Madrid', '🧭', '#0891b2', '#4f46e5'),
-    ('t6', 6, 'PRL', '🦺', '#ea580c', '#ca8a04'),
+    ('t6', 6, 'Manual PRL', '🦺', '#ea580c', '#ca8a04'),
     ('t7', 7, 'Conocimientos generales CRMT', '🏛️', '#16a34a', '#0e7490'),
 ]
 base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
