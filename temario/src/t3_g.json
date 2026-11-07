@@ -1,0 +1,362 @@
+[
+[
+"Cuando un tren no puede reanudar la marcha por sus medios, el envío del tren de auxilio lo gestiona el PCC una vez:",
+"Haya confirmado la inmovilización del tren detenido",
+"El conductor haya evacuado a los viajeros",
+"Se corte la tensión",
+"Art. 5.1.2",
+"una vez haya confirmado la inmovilización del tren detenido."
+],
+[
+"Si el tren detenido recupera las condiciones para reanudar la marcha tras pedir auxilio, el conductor:",
+"Antes de iniciarla lo comunicará al PCC y se atendrá a sus instrucciones",
+"Reanudará la marcha inmediatamente",
+"Esperará al tren de auxilio",
+"Art. 5.1.2",
+"el conductor, antes de iniciarla, lo comunicará al PCC y se atendrá a las instrucciones que este le dé."
+],
+[
+"En el remolque de un tren acoplado a otros trenes, salvo otra indicación del PCC, no se sobrepasarán:",
+"30 km/h",
+"10 km/h",
+"20 km/h",
+"Art. 5.1.2",
+"sin sobrepasar los 30 km/h"
+],
+[
+"En el remolque de un tren mediante barrón no se sobrepasarán:",
+"10 km/h",
+"30 km/h",
+"5 km/h",
+"Art. 5.1.2",
+"sin sobrepasar los 10 km/h."
+],
+[
+"La conducción por vías principales en modo Llave Especial se realizará, salvo otra indicación del PCC, sin sobrepasar:",
+"30 km/h",
+"20 km/h",
+"40 km/h",
+"Art. 5.1.2",
+"La conducción por vías principales en modo Llave Especial, se realizará sin sobrepasar los 30 km/h"
+],
+[
+"Siempre que sea preciso detener un tren, se procurará hacerlo:",
+"En las estaciones",
+"En la interestación más próxima",
+"En una zona iluminada del túnel",
+"Art. 5.1.3",
+"Siempre que sea preciso detener un tren, se procurará hacerlo en las estaciones."
+],
+[
+"Si un tren detenido anormalmente en interestación no puede comunicar con el PCC, tras inmovilizarlo, deberá señalizarse:",
+"Encendiendo los pilotos en cabeza",
+"Encendiendo el alumbrado del túnel",
+"Colocando una baliza roja detrás",
+"Art. 5.1.4",
+"deberá señalizarse encendiendo los pilotos en cabeza."
+],
+[
+"El tren detenido en interestación realizará señales luminosas con la linterna u otro medio para:",
+"Detener al tren que pudiera circular por la vía contraria",
+"Avisar al tren que le sigue",
+"Iluminar la evacuación",
+"Art. 5.1.4",
+"para detener al tren que pudiera circular por la vía contraria."
+],
+[
+"Al detectar en vía contraria un tren detenido con los pilotos encendidos, el conductor:",
+"Detendrá el tren sin rebasar la cabeza del tren detenido",
+"Reducirá a paso de hombre sin detenerse",
+"Hará sonar el claxon y continuará",
+"Art. 5.1.5",
+"detendrá el tren sin rebasar la cabeza del tren detenido o la señalización existente en la plataforma de vía."
+],
+[
+"El cruce con un tren detenido en vía contraria, una vez asegurado, se realizará:",
+"Con precaución a paso de hombre",
+"En marcha a la vista",
+"A 30 km/h",
+"Art. 5.1.5",
+"llevándolo a cabo, en todo caso, con precaución a paso de hombre."
+],
+[
+"En una evacuación por la plataforma de vía con comunicación, el conductor seguirá las instrucciones del PCC, que corresponderán con:",
+"Las normas establecidas en el Plan de Autoprotección",
+"El Reglamento de Viajeros",
+"El Manual de estilo",
+"Art. 5.1.6",
+"que corresponderán con las normas establecidas en el Plan de Autoprotección."
+],
+[
+"Siempre que el PCC detecte la detención anormal de un tren, realizará las gestiones para:",
+"Encender el alumbrado del túnel en esa interestación, si es posible",
+"Cortar la tensión de la línea",
+"Enviar un tren de auxilio",
+"Art. 5.1.6",
+"realizará las gestiones para encender el alumbrado del túnel en esa interestación, si ello es posible."
+],
+[
+"Si se acciona un tirador de alarma y el tren no se detiene por el inhibidor del freno de emergencia, el conductor:",
+"Se comunicará con los viajeros por interfono y valorará si detenerse o continuar a la primera estación",
+"Detendrá el tren inmediatamente",
+"Ignorará la alarma hasta la estación",
+"Art. 5.1.7",
+"el conductor se pondrá en comunicación con los viajeros a través de los interfonos del tren"
+],
+[
+"Si la utilización del tirador de alarma no está justificada, el conductor:",
+"Tomará los datos del viajero para tramitar la infracción",
+"Avisará a la policía",
+"Expulsará al viajero en la siguiente estación",
+"Art. 5.1.7",
+"si la utilización no estuviera justificada tomará los datos del viajero para tramitar la infracción."
+],
+[
+"Detenido en interestación por avería de ATP tras salir con M-Roja y sin comunicación, tras tres minutos el conductor:",
+"Seleccionará M+20 y se dirigirá a paso de hombre hasta la siguiente señal o estación",
+"Seleccionará Llave Especial y continuará a 30 km/h",
+"Retrocederá a la estación",
+"Art. 5.1.8",
+"seleccionará el modo M+20 y se dirigirá a paso de hombre hasta la siguiente señal"
+],
+[
+"Si un tren rebasa el piñón de salida al parar, con comunicación, el PCC autorizará el retroceso si el rebase no es mayor del:",
+"50% de la longitud del tren",
+"25% de la longitud del tren",
+"Un coche",
+"Art. 5.1.9",
+"Si el rebase no ha sido mayor del 50% de la longitud del tren"
+],
+[
+"En trenes con CBTC, el indicativo de que el rebase del piñón no supera el 50% es la indicación:",
+"«Retroceso condicionado»",
+"«Retroceso autorizado»",
+"«M-Roja»",
+"Art. 5.1.9",
+"la indicación “Retroceso condicionado”"
+],
+[
+"En CBTC, el PCC autorizará el retroceso previa:",
+"Inmovilización del tren siguiente fuera del andén de la estación",
+"Evacuación de los viajeros",
+"Desconexión del ATP",
+"Art. 5.1.9",
+"previa inmovilización del tren siguiente fuera del andén de la estación."
+],
+[
+"El retroceso autorizado para situarse en el andén se realizará siempre:",
+"A paso de hombre, emitiendo señales acústicas insistentemente",
+"En marcha a la vista sin señales acústicas",
+"En M+20 a 20 km/h",
+"Art. 5.1.9",
+"se realizará siempre a paso de hombre y con especial atención"
+],
+[
+"Sin comunicación con el PCC y seguro de no haber rebasado más del 50%, el conductor situará el tren:",
+"Cambiándose de cabina y circulando a contravía",
+"Retrocediendo desde la cabina de cabeza",
+"No lo moverá",
+"Art. 5.1.9",
+"tras cambiarse de cabina de mando, situará el tren correctamente en la estación, circulando a contravía."
+],
+[
+"Sin comunicación, si ha rebasado más del 50% y la señal autorizaba su rebase, el conductor:",
+"Informará a los viajeros y continuará hasta la siguiente estación",
+"Retrocederá a paso de hombre",
+"Esperará tres minutos y retrocederá",
+"Art. 5.1.9",
+"si la señal estaba autorizando su rebase, continuará la marcha hasta la siguiente estación."
+],
+[
+"Sin comunicación, si rebasó el piñón y la señal estaba en parada o no está seguro, tras informar a los viajeros:",
+"Esperará tres minutos y continuará a paso de hombre hasta la siguiente señal o estación",
+"Retrocederá inmediatamente",
+"Esperará al responsable operativo",
+"Art. 5.1.9",
+"y tras esperar tres minutos continuará la marcha circulando a paso de hombre, hasta la siguiente señal o estación."
+],
+[
+"En caso de interrupción del suministro de corriente de tracción, el conductor:",
+"Pondrá el regulador en cero y aprovechará la inercia para detenerse en una estación",
+"Aplicará el freno de emergencia",
+"Abatirá los pantógrafos",
+"Art. 5.1.11",
+"el conductor deberá poner en posición cero el regulador de marcha y aprovechar, en la medida de lo posible, la inercia del tren"
+],
+[
+"Con un corte de corriente de tracción superior a diez minutos, el conductor deberá:",
+"Conectar el freno de estacionamiento",
+"Evacuar el tren",
+"Subir los pantógrafos",
+"Art. 5.1.11",
+"este deberá conectar el freno de estacionamiento."
+],
+[
+"Restablecida la corriente sin poder comunicar con el PCC, el conductor esperará:",
+"Dos minutos y reanudará en marcha a la vista",
+"Tres minutos y reanudará a paso de hombre",
+"Cinco minutos",
+"Art. 5.1.11",
+"el conductor esperará dos minutos y a continuación reanudará la circulación en conducción marcha a la vista"
+],
+[
+"En casos de urgencia ante una situación de riesgo, un corte de tensión de catenaria puede solicitarlo directamente al PCC:",
+"Cualquier trabajador, previa identificación",
+"Solo el conductor",
+"Solo el responsable operativo",
+"Art. 5.1.12",
+"cualquier trabajador previa identificación, podrá solicitar directamente al PCC un corte de tensión de catenaria"
+],
+[
+"Un trabajador que presencia un accidente encontrándose fuera de servicio:",
+"Tiene igualmente la obligación de prestar ayuda y colaborar",
+"No tiene obligación alguna",
+"Solo debe avisar al 112",
+"Art. 5.2.1",
+"Prestar la ayuda necesaria a las personas afectadas o heridas."
+],
+[
+"En un accidente, el trabajador se pondrá a disposición de:",
+"El conductor o el trabajador de mayor categoría profesional allí existente",
+"El PCC exclusivamente",
+"La policía",
+"Art. 5.2.1",
+"Ponerse a disposición del conductor o del trabajador de mayor categoría profesional allí existente"
+],
+[
+"Ante una situación de riesgo para la circulación, el trabajador detendrá a todo tren que pueda llegar a la zona empleando, por ejemplo:",
+"Señales gestuales de emergencia",
+"El corte de tensión directo",
+"Una baliza azul",
+"Art. 5.2.2",
+"(señales gestuales de emergencia, etc.)."
+],
+[
+"En situaciones de emergencia, los trabajadores, incluso fuera de servicio, actuarán según:",
+"El Plan de Autoprotección",
+"La NISARC",
+"El Reglamento de Viajeros",
+"Art. 5.2.3",
+"deberán actuar de acuerdo a las normas establecidas en el Plan de Autoprotección."
+],
+[
+"Si un viajero enfermo viaja en el tren, el conductor procurará:",
+"Llegar hasta la primera estación, donde quedará detenido y lo notificará al PCC",
+"Detener el tren inmediatamente",
+"Continuar hasta la terminal",
+"Art. 5.2.4",
+"el conductor procurará llegar hasta la primera estación, donde quedará detenido"
+],
+[
+"Un viajero indispuesto:",
+"En ningún caso se abandonará sin que quede acompañado por personal de servicio o Autoridad competente",
+"Puede quedar en el andén si está consciente",
+"Se deja al cuidado de otros viajeros",
+"Art. 5.2.4",
+"En ningún caso se abandonará a un viajero indispuesto sin que quede acompañado"
+],
+[
+"Tras un alcance a un parachoques o a otro tren, el tren no se moverá hasta que:",
+"Sea revisado por el personal de mantenimiento especializado y dé su conformidad",
+"Lo autorice el PCC por radio",
+"Pasen diez minutos",
+"Art. 5.2.5",
+"hasta que sea revisado por el personal de mantenimiento especializado y este dé su conformidad"
+],
+[
+"Tras un descarrilamiento, el conductor revisará el tren observando si hay viajeros accidentados y:",
+"Si ocupa o no gálibo de la vía contraria",
+"Si funciona el ATP",
+"Si hay tensión en la catenaria",
+"Art. 5.2.6",
+"si ocupa o no gálibo de la vía contraria."
+],
+[
+"Si se declara un incendio en el tren, se adoptarán las medidas especificadas en:",
+"El Plan de Autoprotección",
+"La NIC, art. 4.7",
+"El Manual PRL",
+"Art. 5.2.7",
+"se adoptarán las medidas especificadas en el Plan de Autoprotección."
+],
+[
+"Ante un desperfecto o elemento extraño en la catenaria, queda terminantemente prohibido:",
+"Intentar eliminar los defectos o quitar los objetos sin efectuar el corte de tensión preceptivo",
+"Detener el tren",
+"Avisar a los trenes en sentido contrario",
+"Art. 5.2.8",
+"queda terminantemente prohibido intentar eliminar los defectos o quitar los objetos, sin efectuar el corte de tensión preceptivo."
+],
+[
+"Si la persona arrollada está fallecida, el cadáver intercepta la circulación y no está presente la Autoridad Judicial:",
+"Se formalizará el Acta de retirada de cadáveres y se retirará el cadáver lo más próximo al lugar que ocupaba",
+"Se esperará a la Autoridad Judicial sin mover nada",
+"Se retirará a la estación más próxima",
+"Art. 5.2.9",
+"se formalizará el Acta de retirada de cadáveres (ANEXO)"
+],
+[
+"El Acta de retirada de cadáveres se dejará en poder de:",
+"El personal de servicio que custodie a la persona fallecida",
+"El conductor",
+"La Autoridad Judicial al llegar",
+"Art. 5.2.9",
+"El Acta de retirada de cadáveres se dejará en poder del personal de servicio que custodie a la persona fallecida"
+],
+[
+"El conductor no se detendrá ante una persona herida si está fuera de la plataforma de vía y:",
+"Custodiada ya por otra persona, mientras esta no haga señales de parada",
+"Está consciente",
+"Hay personal sanitario cerca",
+"Art. 5.2.9",
+"No se detendrá si la persona está fuera de la plataforma de vía y custodiada ya por otra persona"
+],
+[
+"Ante una diferencia de criterios en la interpretación de una norma, deberá notificarse a:",
+"El PCC, quien resolverá",
+"La Comisión Técnica de Seguimiento",
+"El superior jerárquico, quien resolverá",
+"Art. 6.1.1",
+"deberá notificarse al PCC, quien resolverá sobre la misma."
+],
+[
+"Los casos urgentes no contemplados en la NIC los resolverá:",
+"El PCC, aplicando criterios de seguridad y eficacia",
+"La Dirección",
+"El conductor",
+"Art. 6.1.2",
+"El PCC resolverá los casos urgentes no contemplados en la presente Normativa, aplicando criterios de seguridad y eficacia."
+],
+[
+"Las instrucciones complementarias que dicten los departamentos:",
+"En ningún caso podrán oponerse a lo establecido en la NIC",
+"Prevalecen sobre la NIC",
+"Requieren aprobación del Consorcio",
+"Art. 6.1.3",
+"Dichas instrucciones en ningún caso podrán oponerse a lo establecido en la mencionada Normativa."
+],
+[
+"La aplicación de la NIC a contratistas y autónomos se fundamenta en la obligación de:",
+"Coordinación de actividades empresariales de la normativa de prevención de riesgos laborales",
+"El contrato de transporte",
+"El Reglamento de Viajeros",
+"Art. 6.1.4",
+"en cumplimiento de la obligación de coordinación de actividades empresariales"
+],
+[
+"La finalidad de la Comisión Técnica de Seguimiento es:",
+"La actualización permanente de la NIC",
+"Sancionar los incumplimientos",
+"Investigar accidentes",
+"Art. 6.1.6",
+"cuya finalidad será la actualización permanente de esta Normativa (NIC)"
+],
+[
+"¿Cuál de estos documentos NO figura en el Anexo de la NIC?",
+"Hoja de recogida de firmas",
+"Boletín de doble precaución",
+"Acta de retirada de cadáveres de la vía",
+"Anexo",
+"ACTA DE RETIRADA DE CADÁVERES DE LA VÍA"
+]
+]
