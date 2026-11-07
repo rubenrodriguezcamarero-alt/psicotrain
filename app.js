@@ -26,11 +26,12 @@ if (typeof TEMARIO_PRIVADO !== 'undefined') {
   TEMAS.forEach(t => { const p = TEMARIO_PRIVADO.preguntas[t.id]; if (p && p.length) { TEMARIO.preguntas[t.id] = p; t.n = p.length; } });
 }
 TEMAS.forEach(t => CATS.push({ id: t.id, name: `${t.num}. ${t.name}`, em: t.em, c1: t.c1, c2: t.c2, g: 'temario',
-  desc: t.n ? `${t.n} preguntas tipo test` : t.privado ? 'Solo en la versión privada' : 'Pendiente del PDF', off: !t.n }));
+  desc: t.n ? `${t.n} preguntas` : t.privado ? 'Solo en la versión privada' : 'Pendiente del PDF', off: !t.n }));
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 const TEMARIO_IDS = CATS.filter(c => c.g === 'temario' && !c.off).map(c => c.id);
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 const ESPACIAL = CATS.filter(c => c.g === 'spatial').map(c => c.id);
+const PSICO = [...VERBAL, ...ESPACIAL];
 
 // ---------------- Almacenamiento ----------------
 const KEY = 'psicotrain.v1';
@@ -53,12 +54,27 @@ function draw(cat, len) {
   return decks[cat].pop();
 }
 const opt = (t, ok) => ({ t, ok: !!ok });
+// En el temario se recuerdan las preguntas ya vistas (en este móvil) para que salgan
+// primero las que nunca han salido; cuando se han visto todas, empieza otra vuelta.
+const enCurso = {};
+function drawTemario(cat, len) {
+  const vistas = new Set((DB.seen || {})[cat] || []);
+  const usadas = enCurso[cat] || (enCurso[cat] = new Set());
+  let libres = [...Array(len).keys()].filter(k => !vistas.has(k) && !usadas.has(k));
+  if (!libres.length) {
+    if (DB.seen) DB.seen[cat] = []; // vuelta completa al tema
+    libres = [...Array(len).keys()].filter(k => !usadas.has(k));
+    if (!libres.length) { usadas.clear(); libres = [...Array(len).keys()]; }
+  }
+  const i = pick(libres); usadas.add(i); return i;
+}
+function vistasTema(cat) { return ((DB.seen || {})[cat] || []).length; }
 
 function makeQuestion(cat, idx) {
   if (CAT[cat] && CAT[cat].g === 'temario') {
     // Pregunta tipo test del temario: tres opciones a), b), c) y la cita del PDF como explicación
     const L = TEMARIO.preguntas[cat];
-    const i = idx ?? draw(cat, L.length);
+    const i = idx != null && idx < L.length ? idx : drawTemario(cat, L.length);
     const [p, ok, w1, w2, ref, cita] = L[i];
     return { cat, id: i, kind: 'text', abc: true, prompt: p, word: '',
       options: shuffle([opt(ok, 1), opt(w1), opt(w2)]),
@@ -174,7 +190,7 @@ function streak() {
   while (set.has(`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)) { n++; d.setDate(d.getDate() - 1); }
   return n;
 }
-function errCount() { return Object.values(DB.errors).reduce((a, l) => a + l.length, 0); }
+function errCount(cats) { return Object.entries(DB.errors).reduce((a, [c, l]) => a + (!cats || cats.includes(c) ? l.length : 0), 0); }
 
 function renderHome() {
   const h = new Date().getHours();
@@ -191,7 +207,7 @@ function renderHome() {
   const card = c => {
     const s = catStats(c.id);
     return `<button class="cat${c.wide ? ' wide' : ''}${c.off ? ' off' : ''}" data-cat="${c.id}" ${c.off ? 'disabled' : ''} style="--c1:${c.c1};--c2:${c.c2}">
-      <span class="em">${c.em}</span><div><b>${c.name}</b><small>${c.desc}</small>
+      <span class="em">${c.em}</span><div><b>${c.name}</b><small>${c.g === 'temario' && !c.off ? `${c.desc} · ${Math.min(vistasTema(c.id), TEMARIO.preguntas[c.id].length)} vistas` : c.desc}</small>
       <div class="bar"><i style="width:${s.pct ?? 0}%"></i></div></div>
       ${s.pct !== null ? `<span class="pct">${s.pct}%</span>` : ''}</button>`;
   };
@@ -201,9 +217,14 @@ function renderHome() {
   const nt = TEMARIO_IDS.reduce((a, id) => a + TEMARIO.preguntas[id].length, 0);
   $('#btnTemario').hidden = !nt;
   $('#temarioInfo').textContent = `${Math.min(80, nt)} preguntas ${TEMARIO_IDS.length === 1 ? 'del tema disponible' : `de los ${TEMARIO_IDS.length} temas disponibles`} · 80 min · los fallos restan ⅓`;
-  const ne = errCount();
+  const ne = errCount(PSICO);
   $('#btnReview').hidden = !ne;
   $('#nErr').textContent = ne;
+  const nt2 = errCount(TEMARIO_IDS);
+  $('#btnReviewTem').hidden = !nt2;
+  $('#nErrTem').textContent = nt2;
+  const vistas = TEMARIO_IDS.reduce((a, id) => a + Math.min(vistasTema(id), TEMARIO.preguntas[id].length), 0);
+  $('#temarioProg').textContent = nt ? `Has visto ${vistas} de ${nt} preguntas del temario (${Math.floor(100 * vistas / nt)}%). Salen antes las que aún no has visto.` : '';
 }
 
 // ---------------- Test ----------------
@@ -216,8 +237,8 @@ function startQuiz(cats, mode = 'normal') {
   const n = DB.settings.count;
   if (mode === 'review') {
     const items = [];
-    for (const [c, ids] of Object.entries(DB.errors)) ids.forEach(id => items.push([c, id]));
-    list = shuffle(items).slice(0, n).map(([c, id]) => makeQuestion(c, id));
+    for (const [c, ids] of Object.entries(DB.errors)) if (cats.includes(c)) ids.forEach(id => items.push([c, id]));
+    list = shuffle(items).slice(0, cats === TEMARIO_IDS ? Math.max(n, 20) : n).map(([c, id]) => makeQuestion(c, id));
   } else if (mode === 'exam') {
     // Como el examen real: bloque verbal (20) y bloque espacial (20), 40 minutos, los fallos restan ⅓
     const bloque = (cats, nombre) => shuffle(Array.from({ length: 20 }, (_, k) => cats[k % cats.length]))
@@ -374,6 +395,11 @@ function cerrarCarita() { clearTimeout(carita.t); const el = $('#carita'); el.cl
 function record(q, ok) {
   const s = DB.stats[q.cat] || (DB.stats[q.cat] = { ok: 0, n: 0 });
   s.n++; if (ok) s.ok++;
+  if (q.id !== undefined && CAT[q.cat] && CAT[q.cat].g === 'temario') {
+    DB.seen = DB.seen || {};
+    const v = DB.seen[q.cat] || (DB.seen[q.cat] = []);
+    if (!v.includes(q.id)) v.push(q.id);
+  }
   if (q.id !== undefined) {
     const l = DB.errors[q.cat] || (DB.errors[q.cat] = []);
     const k = l.indexOf(q.id);
@@ -537,12 +563,13 @@ document.addEventListener('click', e => {
 $('#btnExam').onclick = () => startQuiz(CATS.map(c => c.id), 'exam');
 $('#btnMix').onclick = () => startQuiz([...VERBAL, ...ESPACIAL]);
 $('#btnTemario').onclick = () => startQuiz(TEMARIO_IDS, 'temario');
-$('#btnReview').onclick = () => startQuiz(VERBAL, 'review');
+$('#btnReview').onclick = () => startQuiz(PSICO, 'review');
+$('#btnReviewTem').onclick = () => startQuiz(TEMARIO_IDS, 'review');
 $('#btnNext').onclick = next;
 $('#btnQuit').onclick = () => {
   clearInterval(tick); clearTimeout(advanceT); $('#cheer').classList.remove('show'); $('#feedback').classList.remove('show'); Q = null; renderHome(); show('home');
 };
-$('#btnAgain').onclick = () => startQuiz(Q.cats, Q.mode === 'review' && !errCount() ? 'normal' : Q.mode);
+$('#btnAgain').onclick = () => startQuiz(Q.cats, Q.mode === 'review' && !errCount(Q.cats) ? 'normal' : Q.mode);
 $('#btnHome').onclick = () => { Q = null; renderHome(); show('home'); };
 $('#btnSettings').onclick = () => openSheet(true);
 $('#nameInput').addEventListener('input', e => { DB.settings.name = e.target.value.slice(0, 30); save(); renderHome(); });
