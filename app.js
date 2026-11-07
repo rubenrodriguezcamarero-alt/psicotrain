@@ -19,7 +19,12 @@ const CATS = [
   { id: 'analogias', name: 'Analogías', em: '🧩', desc: 'A es a B como…', c1: '#6366f1', c2: '#c026d3', g: 'verbal' },
   { id: 'intrusa', name: 'Palabra intrusa', em: '🔍', desc: '¿Cuál no encaja?', c1: '#0ea5e9', c2: '#7c3aed', g: 'verbal' },
 ];
+// Temas del temario de la oposición (datos en temario/datos.js)
+const TEMAS = typeof TEMARIO !== 'undefined' ? TEMARIO.temas : [];
+TEMAS.forEach(t => CATS.push({ id: t.id, name: `${t.num}. ${t.name}`, em: t.em, c1: t.c1, c2: t.c2, g: 'temario',
+  desc: t.n ? `${t.n} preguntas tipo test` : 'Pendiente del PDF', off: !t.n }));
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const TEMARIO_IDS = CATS.filter(c => c.g === 'temario' && !c.off).map(c => c.id);
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 const ESPACIAL = CATS.filter(c => c.g === 'spatial').map(c => c.id);
 
@@ -46,6 +51,15 @@ function draw(cat, len) {
 const opt = (t, ok) => ({ t, ok: !!ok });
 
 function makeQuestion(cat, idx) {
+  if (CAT[cat] && CAT[cat].g === 'temario') {
+    // Pregunta tipo test del temario: tres opciones a), b), c) y la cita del PDF como explicación
+    const L = TEMARIO.preguntas[cat];
+    const i = idx ?? draw(cat, L.length);
+    const [p, ok, w1, w2, ref, cita] = L[i];
+    return { cat, id: i, kind: 'text', abc: true, prompt: p, word: '',
+      options: shuffle([opt(ok, 1), opt(w1), opt(w2)]),
+      explain: `<b>${ref}</b> · «${cita}»`, review: `${ref}: ${ok}` };
+  }
   if (cat === 'giros') return Fig.giro(DB.settings.diff);
   if (cat === 'volteos') return Fig.volteo(DB.settings.diff);
   if (Spatial[cat]) return Spatial[cat](DB.settings.diff);
@@ -172,13 +186,17 @@ function renderHome() {
   $('#stTotal').textContent = n;
   const card = c => {
     const s = catStats(c.id);
-    return `<button class="cat${c.wide ? ' wide' : ''}" data-cat="${c.id}" style="--c1:${c.c1};--c2:${c.c2}">
+    return `<button class="cat${c.wide ? ' wide' : ''}${c.off ? ' off' : ''}" data-cat="${c.id}" ${c.off ? 'disabled' : ''} style="--c1:${c.c1};--c2:${c.c2}">
       <span class="em">${c.em}</span><div><b>${c.name}</b><small>${c.desc}</small>
       <div class="bar"><i style="width:${s.pct ?? 0}%"></i></div></div>
       ${s.pct !== null ? `<span class="pct">${s.pct}%</span>` : ''}</button>`;
   };
   $('#gridSpatial').innerHTML = CATS.filter(c => c.g === 'spatial').map(card).join('');
   $('#gridVerbal').innerHTML = CATS.filter(c => c.g === 'verbal').map(card).join('');
+  $('#gridTemario').innerHTML = CATS.filter(c => c.g === 'temario').map(card).join('');
+  const nt = TEMARIO_IDS.reduce((a, id) => a + TEMARIO.preguntas[id].length, 0);
+  $('#btnTemario').hidden = !nt;
+  $('#temarioInfo').textContent = `${Math.min(80, nt)} preguntas ${TEMARIO_IDS.length === 1 ? 'del tema disponible' : `de los ${TEMARIO_IDS.length} temas disponibles`} · 80 min · los fallos restan ⅓`;
   const ne = errCount();
   $('#btnReview').hidden = !ne;
   $('#nErr').textContent = ne;
@@ -201,13 +219,22 @@ function startQuiz(cats, mode = 'normal') {
     const bloque = (cats, nombre) => shuffle(Array.from({ length: 20 }, (_, k) => cats[k % cats.length]))
       .map(c => ({ lazy: c, block: nombre }));
     list = [...bloque(VERBAL, 'verbal'), ...bloque(ESPACIAL, 'espacial')];
+  } else if (mode === 'temario') {
+    // Test de todo el temario: 80 preguntas repartidas entre todos los temas disponibles
+    const total = Math.min(80, TEMARIO_IDS.reduce((a, id) => a + TEMARIO.preguntas[id].length, 0));
+    const seq = [];
+    for (let k = 0; seq.length < total; k++) {
+      const id = TEMARIO_IDS[k % TEMARIO_IDS.length];
+      if (seq.filter(x => x === id).length < TEMARIO.preguntas[id].length) seq.push(id);
+    }
+    list = shuffle(seq).map(c => ({ lazy: c }));
   } else {
     const seq = [];
     for (let k = 0; k < n; k++) seq.push(cats[k % cats.length]);
     list = shuffle(seq).map(c => ({ lazy: c })); // cada pregunta se genera al mostrarla
   }
   Q = { cats, mode, list, i: 0, res: [], start: Date.now(), racha: 0, fallosSeguidos: 0, ultimoAnimo: -9,
-        examEnd: mode === 'exam' ? Date.now() + 40 * 60 * 1000 : 0 };
+        examEnd: mode === 'exam' ? Date.now() + 40 * 60 * 1000 : mode === 'temario' ? Date.now() + 80 * 60 * 1000 : 0 };
   show('quiz');
   renderQuestion();
 }
@@ -235,7 +262,8 @@ function renderQuestion() {
   const box = $('#qOpts');
   box.className = 'opts' + (q.kind === 'fig' ? ' figs' : '');
   box.innerHTML = q.options.map((o, i) =>
-    `<button class="opt" data-i="${i}"><span class="l">${'ABCD'[i]}</span>${o.html || o.t}</button>`).join('');
+    `<button class="opt" data-i="${i}"><span class="l">${q.abc ? 'abc'[i] + ')' : 'ABCD'[i]}</span>${o.html || o.t}</button>`).join('');
+  $('#qPrompt').classList.toggle('largo', !!q.abc);
   $('#feedback').classList.remove('show', 'good', 'wrong');
   $('.spacer').style.height = '24px'; window.scrollTo(0, 0);
   q.t0 = Date.now();
@@ -392,6 +420,17 @@ function finish(timeUp) {
       `<div class="blk"><b>${t}</b><span>${x.ok} ✓ · ${x.bad} ✗ · ${x.blank} en blanco</span><strong>${f(x.nota)}</strong></div>`).join('')
       + `<div class="blk total"><b>Media de los dos bloques</b><span>Así se calcula en el examen de Metro</span><strong>${f((v.nota + e.nota) / 2)}</strong></div>`;
     bl.hidden = false;
+  } else if (Q.mode === 'temario') {
+    // Nota de cada tema en el test de todo el temario
+    const f = x => x.toFixed(1).replace('.', ',');
+    bl.innerHTML = TEMARIO_IDS.map(id => {
+      const t = Q.list.filter(x => x.cat === id || x.lazy === id).length;
+      if (!t) return '';
+      const r = Q.res.filter(x => x.q.cat === id);
+      const ok = r.filter(x => x.ok).length, bad = r.filter(x => !x.ok && !x.blank).length;
+      return `<div class="blk"><b>${CAT[id].em} ${CAT[id].name}</b><span>${ok} ✓ · ${bad} ✗ · ${t - ok - bad} en blanco</span><strong>${f(Math.max(0, (ok - bad / 3) / t * 10))}</strong></div>`;
+    }).join('');
+    bl.hidden = false;
   } else bl.hidden = true;
   $('#resMotiv').textContent = frase(pct >= 75 ? 'alto' : pct >= 50 ? 'medio' : 'bajo');
   let shown = 0;
@@ -492,7 +531,8 @@ document.addEventListener('click', e => {
   }
 });
 $('#btnExam').onclick = () => startQuiz(CATS.map(c => c.id), 'exam');
-$('#btnMix').onclick = () => startQuiz(CATS.map(c => c.id));
+$('#btnMix').onclick = () => startQuiz([...VERBAL, ...ESPACIAL]);
+$('#btnTemario').onclick = () => startQuiz(TEMARIO_IDS, 'temario');
 $('#btnReview').onclick = () => startQuiz(VERBAL, 'review');
 $('#btnNext').onclick = next;
 $('#btnQuit').onclick = () => {

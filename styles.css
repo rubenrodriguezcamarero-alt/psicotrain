@@ -383,3 +383,10 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 @keyframes caritaWobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
 @keyframes lagrima { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(70px); } }
 @media (prefers-reduced-motion: reduce) { .carita-card { transform: none; } }
+
+/* ---------- Temario de la oposición ---------- */
+.hero-temario { background: linear-gradient(135deg, #e3001b, #9333ea 55%, #1d4fb5); box-shadow: 0 14px 34px rgba(29, 79, 181, .35); }
+.hero-temario[hidden] { display: none; }
+.cat.off { opacity: .45; filter: grayscale(.7); cursor: default; }
+.cat.off:active { transform: none; }
+.prompt.largo { text-align: left; font-size: 17.5px; font-weight: 600; }
