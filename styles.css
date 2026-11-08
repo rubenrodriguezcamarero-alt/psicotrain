@@ -155,7 +155,8 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .count { color: var(--muted); font-weight: 700; font-size: 14px; }
 .qcard {
   background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 18px;
-  margin-bottom: 14px; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+  margin-bottom: 14px; box-shadow: var(--shadow);
+  /* sin backdrop-filter: en Safari de iPhone dejaba restos del texto anterior al cambiar de pregunta */
 }
 .prompt { font-size: 17px; line-height: 1.4; margin: 0; text-align: center; }
 .word { font-size: 30px; font-weight: 800; text-align: center; margin: 10px 0 2px; letter-spacing: -.3px;

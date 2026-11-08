@@ -280,7 +280,9 @@ function renderQuestion() {
     if (Q.i === ini) setTimeout(() => Q === esteTest && animo(q.block === 'verbal' ? 'Bloque 1 de 2: razonamiento verbal 📚' : 'Bloque 2 de 2: razonamiento espacial 🧩 ¡A por ello!'), 300);
   } else $('#qCount').textContent = `${Q.i + 1} / ${Q.list.length}`;
   $('#prog').style.width = `${100 * Q.i / Q.list.length}%`;
-  $('#qPrompt').innerHTML = q.prompt;
+  // Cada enunciado va en un elemento nuevo para que el navegador lo pinte desde cero
+  const oldP = $('#qPrompt'), newP = oldP.cloneNode(false);
+  newP.innerHTML = q.prompt; oldP.replaceWith(newP);
   const w = $('#qWord');
   w.innerHTML = q.word || ''; w.style.display = q.word ? '' : 'none'; w.classList.toggle('analog', !!q.analog);
   $('#qFig').innerHTML = q.figHtml || ''; $('#qFig').style.display = q.figHtml ? '' : 'none';
