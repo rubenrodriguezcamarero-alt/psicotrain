@@ -65,11 +65,13 @@ const Spatial = (() => {
     '<circle cx=".5" cy=".5" r=".2" class="sy"/>',
     '<circle cx=".5" cy=".5" r=".22" class="sy-o"/>',
     '<path d="M.5 .2V.8M.2 .5H.8" class="sy-l"/>',
-    '<path d="M.27 .27L.73 .73M.73 .27L.27 .73" class="sy-l"/>',
+    '<circle cx=".3" cy=".3" r=".08" class="sy"/><circle cx=".7" cy=".3" r=".08" class="sy"/><circle cx=".3" cy=".7" r=".08" class="sy"/><circle cx=".7" cy=".7" r=".08" class="sy"/>',
     '<rect x=".3" y=".3" width=".4" height=".4" class="sy"/>',
-    '<path d="M.5 .2L.8 .5L.5 .8L.2 .5Z" class="sy-o"/>',
+    '<rect x=".28" y=".28" width=".44" height=".44" class="sy-o"/>',
   ];
-  const SYM_NAME = ['el punto', 'el círculo', 'la cruz', 'el aspa', 'el cuadrado', 'el rombo'];
+  // Sin aspa ni rombo: en la vista en perspectiva el aspa parece una cruz (y al revés)
+  // y el rombo parece un cuadrado, lo que hacía que el cubo dibujado no se reconociera.
+  const SYM_NAME = ['el punto', 'el círculo', 'la cruz', 'los cuatro puntos', 'el cuadrado relleno', 'el cuadrado hueco'];
   const neg = a => a.map(v => -v);
   // Pliega el desarrollo: devuelve hacia dónde mira cada cara en el cubo montado
   function fold(net) {
@@ -89,13 +91,16 @@ const Spatial = (() => {
   }
   const apply = (m, c) => [0, 1, 2].map(i => m[i][0] * c[0] + m[i][1] * c[1] + m[i][2] * c[2]);
   const eq = (a, b) => a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
-  // Todas las vistas posibles del cubo montado: [arriba, derecha, izquierda]
+  // Todas las vistas posibles del cubo montado: [arriba, derecha, izquierda] tal como se dibujan.
+  // fold() trabaja con el desarrollo visto por la cara impresa, y el dibujo isométrico pone +x a la
+  // derecha, lo que equivale a verlo en espejo: por eso la cara +y es la que se dibuja a la derecha.
+  // (Comprobado con un plegado físico independiente: tools/test_cubos.js)
   function views(normals, sym) {
     const set = new Set();
     for (const m of ROTS) {
       const r = normals.map(n => apply(m, n));
       const f = d => sym[r.findIndex(n => eq(n, d))];
-      set.add([f([0, 0, 1]), f([1, 0, 0]), f([0, 1, 0])].join(','));
+      set.add([f([0, 0, 1]), f([0, 1, 0]), f([1, 0, 0])].join(','));
     }
     return set;
   }
@@ -154,7 +159,7 @@ const Spatial = (() => {
           figHtml: netHtml,
           options: shuffle([{ html: cubeSvg(ok.split(',').map(Number)), ok: true, view: ok }, ...[...wr].map(w => ({ html: cubeSvg(w.split(',').map(Number)), view: w }))]),
           explain: 'Al montar el cubo, las caras opuestas nunca se ven a la vez y el orden alrededor de cada esquina no se puede invertir. Truco: en una fila de tres caras, la primera y la tercera quedan opuestas.',
-          _valid: [...valid],
+          _valid: [...valid], _net: net, _sym: sym,
         };
       }
       if (tipo === 1) {
@@ -168,7 +173,7 @@ const Spatial = (() => {
           figHtml: netHtml,
           options: shuffle([{ html: cubeSvg(bad.split(',').map(Number)), ok: true, view: bad }, ...oks.map(w => ({ html: cubeSvg(w.split(',').map(Number)), view: w }))]),
           explain: 'Ese cubo junta dos caras que en realidad quedan opuestas, o las coloca en el orden contrario. Las otras tres sí salen al montar el desarrollo.',
-          _valid: [...valid],
+          _valid: [...valid], _net: net, _sym: sym,
         };
       }
       const f = sym[rnd(6)], o = opp(f);
