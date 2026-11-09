@@ -400,3 +400,19 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .lt h3 { margin: 0 0 6px; font-size: 17px; } .lt h3 small { color: var(--muted); font-weight: 600; font-size: 13px; }
 .lt ol { margin: 0; padding-left: 26px; columns: 2; column-gap: 18px; font-size: 14px; line-height: 1.5; }
 .lt-tramo { margin: 8px 0 2px; font-weight: 700; font-size: 13px; color: var(--muted); }
+
+.cb { display: inline-block; min-width: 18px; padding: 0 4px; margin-left: 4px; border-radius: 4px; font-size: 11px; font-weight: 800; line-height: 17px; text-align: center; color: #fff; vertical-align: 1px; }
+.lt ol { columns: 1; }
+.cb-l1 { background: #38a3dc; }
+.cb-l2 { background: #e3001b; }
+.cb-l3 { background: #f5c400; color: #1d4fb5; }
+.cb-l4 { background: #a0522d; }
+.cb-l5 { background: #8fbf26; }
+.cb-l6 { background: #8c8c8c; }
+.cb-l7 { background: #f39200; }
+.cb-l8 { background: #ec82b1; }
+.cb-l9 { background: #a3238e; }
+.cb-l10 { background: #00539f; }
+.cb-l11 { background: #0b8c3c; }
+.cb-l12 { background: #a49a00; }
+.cb-ml1, .cb-ml2, .cb-ml3, .cb-r { background: #fff; color: #1d60a9; border: 1px solid #1d60a9; line-height: 15px; }

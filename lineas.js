@@ -10,8 +10,15 @@ const Lineas = (() => {
   const est = Object.fromEntries(L.map(l => [l.id, [...new Map(l.tramos.flat().map(s => [norm(s), s])).values()]]));
   const lineasDe = new Map();
   L.forEach(l => est[l.id].forEach(s => { const k = norm(s); if (!lineasDe.has(k)) lineasDe.set(k, new Set()); lineasDe.get(k).add(l.id); }));
+  // Correspondencias marcadas en los planos: también cuentan como líneas que pasan por la estación
+  const TODAS = typeof LINEAS !== 'undefined' ? LINEAS : [];
+  const NOMBRE = { ...Object.fromEntries(TODAS.map(l => [l.id, l.nombre])), ml1: 'Metro Ligero 1', ml2: 'Metro Ligero 2', ml3: 'Metro Ligero 3', r: 'Ramal' };
+  L.forEach(l => Object.entries(l.corr || {}).forEach(([s, ls]) => ls.forEach(o => lineasDe.get(norm(s)).add(o))));
   const tiene = (id, s) => lineasDe.get(norm(s))?.has(id);
-  const nom = id => byId[id].nombre;
+  const nom = id => NOMBRE[id] || id;
+  // Líneas de Metro «normales» para usar como opciones incorrectas
+  const METRO = TODAS.map(l => l.id);
+  const corrDe = id => Object.entries(byId[id].corr || {});
   const opt = (t, ok) => ({ t, ok: !!ok });
   const q = (cat, id, prompt, ok, wrongs, explain) => ({
     cat, id, kind: 'text', abc: true, prompt, word: '',
@@ -26,12 +33,12 @@ const Lineas = (() => {
     linea(id) {
       if (L.length < 3) return null;
       const s = pick(est[id]), suyas = lineasDe.get(norm(s));
-      const malas = otras(id, 2, l => !suyas.has(l.id));
+      const malas = shuffle(METRO.filter(m => !suyas.has(m))).slice(0, 2);
       if (malas.length < 2) return null;
       return suyas.size === 1
-        ? [`¿A qué línea pertenece la estación <b>${s}</b>?`, nom(id), malas.map(l => l.nombre), `${s} está en el listado de la ${nom(id)}.`]
-        : [`¿Cuál de estas líneas pasa por la estación <b>${s}</b>?`, nom(id), malas.map(l => l.nombre),
-          `${s} aparece en los listados de: ${[...suyas].map(nom).join(', ')}.`];
+        ? [`¿A qué línea pertenece la estación <b>${s}</b>?`, nom(id), malas.map(nom), `${s} está en el listado de la ${nom(id)} y el plano no marca correspondencias.`]
+        : [`¿Cuál de estas líneas pasa por la estación <b>${s}</b>?`, nom(id), malas.map(nom),
+          `Según los planos, por ${s} pasan: ${[...suyas].map(nom).join(', ')}.`];
     },
     // ¿Cuántas estaciones tiene la línea X?
     numero(id) {
@@ -80,12 +87,14 @@ const Lineas = (() => {
     },
     // ¿En qué estación coinciden dos líneas?
     coinciden(id) {
-      const pares = L.filter(l => l.id !== id).map(l => [l, est[id].filter(s => tiene(l.id, s))]).filter(([, c]) => c.length);
+      // Solo estaciones que aparecen con el mismo nombre en los dos listados
+      const enLista = (lid, s) => est[lid].some(x => norm(x) === norm(s));
+      const pares = L.filter(l => l.id !== id).map(l => [l, est[id].filter(s => enLista(l.id, s))]).filter(([, c]) => c.length);
       if (!pares.length) return null;
       const [o, comunes] = pick(pares), ok = pick(comunes);
       const ws = shuffle(est[id].filter(s => !tiene(o.id, s))).slice(0, 2); if (ws.length < 2) return null;
       return [`¿En cuál de estas estaciones coinciden la <b>${nom(id)}</b> y la <b>${o.nombre}</b>?`, ok, ws,
-        `${ok} aparece en los listados de las dos líneas.`];
+        `${ok} aparece en los listados de la ${nom(id)} y de la ${o.nombre}.`];
     },
     // ¿Cuántas estaciones hay entre A y B?
     distancia(id) {
@@ -94,6 +103,32 @@ const Lineas = (() => {
       const ws = [n - 1, n + 1, n + 2].filter(x => x >= 0).slice(0, 2).map(String);
       return [`En la ${nom(id)}, ¿cuántas estaciones hay <b>entre</b> ${t[i]} y ${t[j]} (sin contarlas a ellas)?`, String(n), ws,
         `${t.slice(i, j + 1).join(' → ')}: ${n} estaciones en medio.`];
+    },
+    // ¿Con qué línea hay correspondencia en la estación X?
+    corrLinea(id) {
+      const cs = corrDe(id); if (!cs.length) return null;
+      const [s, ls] = pick(cs), ok = pick(ls), suyas = lineasDe.get(norm(s));
+      const malas = shuffle(METRO.filter(m => !suyas.has(m))).slice(0, 2);
+      if (malas.length < 2) return null;
+      return [`En la estación <b>${s}</b> de la ${nom(id)}, ¿con qué línea hay correspondencia?`, nom(ok), malas.map(nom),
+        `El plano de la ${nom(id)} marca en ${s}: ${ls.map(nom).join(', ')}.`];
+    },
+    // ¿En qué estación de la línea X se hace transbordo a la línea Y?
+    corrEstacion(id) {
+      const cs = corrDe(id); if (!cs.length) return null;
+      const destinos = [...new Set(cs.flatMap(([, ls]) => ls))], o = pick(destinos);
+      const oks = cs.filter(([, ls]) => ls.includes(o)).map(([s]) => s), ok = pick(oks);
+      const ws = shuffle(est[id].filter(s => !tiene(o, s))).slice(0, 2); if (ws.length < 2) return null;
+      return [`En la ${nom(id)}, ¿en qué estación hay correspondencia con la <b>${nom(o)}</b>?`, ok, ws,
+        `Según el plano de la ${nom(id)}, hay correspondencia con la ${nom(o)} en: ${oks.join(', ')}.`];
+    },
+    // ¿Cuántas correspondencias con otras líneas tiene la estación X?
+    corrNumero(id) {
+      const cs = corrDe(id); if (!cs.length) return null;
+      const [s, ls] = pick(cs), n = ls.length;
+      const ws = [n + 1, n + 2, n - 1].filter(x => x >= 0 && x !== n).slice(0, 2).map(String);
+      return [`Según el plano de la ${nom(id)}, ¿con cuántas líneas (Metro, Metro Ligero o Ramal) tiene correspondencia la estación <b>${s}</b>?`, String(n), ws,
+        `${s}: ${ls.map(nom).join(', ')}.`];
     },
   };
   const NOMBRES = Object.keys(TIPOS);
