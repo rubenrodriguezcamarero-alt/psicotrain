@@ -15,7 +15,7 @@ uri = lambda f, t: f'data:{t};base64,' + base64.b64encode(open(d + f, 'rb').read
 icon, c1, c2 = uri('icons/icon-192.png', 'image/png'), uri('assets/cara.jpg', 'image/jpeg'), uri('assets/cara2.jpg', 'image/jpeg')
 body = html[html.index('<body>') + 6:html.index('<script src="data.js">')]
 body = body.replace('src="icons/icon-192.png"', f'src="{icon}"').replace('src="assets/cara.jpg"', f'src="{c1}"')
-scripts = ['data.js', 'figures.js', 'spatial.js', 'motivacion.js', 'temario/datos.js']
+scripts = ['data.js', 'figures.js', 'spatial.js', 'motivacion.js', 'temario/datos.js', 'lineas/datos.js', 'lineas.js']
 if os.path.exists(d + 'temario/datos_privado.js'):
     scripts.append('temario/datos_privado.js')
 scripts.append('app.js')

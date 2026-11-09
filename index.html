@@ -70,6 +70,18 @@
     <p class="temprog" id="temarioProg"></p>
     <div class="grid" id="gridTemario"></div>
 
+    <h3 class="sec">Líneas</h3>
+    <button class="hero hero-lineas" id="btnLineas">
+      <h2>Test de líneas</h2>
+      <p id="lineasInfo"></p>
+      <span class="go">Empezar ➜</span>
+      <span class="big">🚇</span>
+    </button>
+    <div class="pills">
+      <button class="pill" id="btnListados">📋 Ver los listados</button>
+    </div>
+    <div class="grid" id="gridLineas"></div>
+
     <h3 class="sec">Aptitud espacial</h3>
     <div class="grid" id="gridSpatial"></div>
 
@@ -80,6 +92,14 @@
   </section>
 
   <!-- PREGUNTA -->
+  <section id="listados" class="view">
+    <div class="qtop">
+      <button class="icon-btn" id="btnListadosBack" aria-label="Volver">✕</button>
+      <h2 class="lt-title">Listados de líneas</h2>
+    </div>
+    <div id="listadosBox"></div>
+  </section>
+
   <section id="quiz" class="view">
     <div class="qtop">
       <button class="icon-btn" id="btnQuit" aria-label="Salir">✕</button>
@@ -182,6 +202,8 @@
 <script src="spatial.js"></script>
 <script src="motivacion.js"></script>
 <script src="temario/datos.js"></script>
+<script src="lineas/datos.js"></script>
+<script src="lineas.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

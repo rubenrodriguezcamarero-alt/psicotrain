@@ -27,7 +27,13 @@ if (typeof TEMARIO_PRIVADO !== 'undefined') {
 }
 TEMAS.forEach(t => CATS.push({ id: t.id, name: `${t.num}. ${t.name}`, em: t.em, c1: t.c1, c2: t.c2, g: 'temario',
   desc: t.n ? `${t.n} preguntas` : t.privado ? 'Solo en la versión privada' : 'Pendiente del PDF', off: !t.n }));
+// Líneas de Metro (listados en lineas/datos.js)
+const LIN = typeof Lineas !== 'undefined' ? Lineas : { lineas: [], todas: [], est: {} };
+LIN.todas.forEach(l => { const n = LIN.est[l.id]?.length;
+  CATS.push({ id: l.id, name: l.nombre, em: '🚇', c1: l.color, c2: l.color, g: 'lineas',
+    desc: n ? `${n} estaciones` : 'Pendiente del listado', off: !n }); });
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const LINEAS_IDS = CATS.filter(c => c.g === 'lineas' && !c.off).map(c => c.id);
 const TEMARIO_IDS = CATS.filter(c => c.g === 'temario' && !c.off).map(c => c.id);
 const VERBAL = CATS.filter(c => c.g === 'verbal').map(c => c.id);
 const ESPACIAL = CATS.filter(c => c.g === 'spatial').map(c => c.id);
@@ -80,6 +86,7 @@ function makeQuestion(cat, idx) {
       options: shuffle([opt(ok, 1), opt(w1), opt(w2)]),
       explain: `<b>${ref}</b> · «${cita}»`, review: `${ref}: ${ok}` };
   }
+  if (CAT[cat] && CAT[cat].g === 'lineas') return LIN.pregunta(cat);
   if (cat === 'giros') return Fig.giro(DB.settings.diff);
   if (cat === 'volteos') return Fig.volteo(DB.settings.diff);
   if (Spatial[cat]) return Spatial[cat](DB.settings.diff);
@@ -214,6 +221,10 @@ function renderHome() {
   $('#gridSpatial').innerHTML = CATS.filter(c => c.g === 'spatial').map(card).join('');
   $('#gridVerbal').innerHTML = CATS.filter(c => c.g === 'verbal').map(card).join('');
   $('#gridTemario').innerHTML = CATS.filter(c => c.g === 'temario').map(card).join('');
+  $('#gridLineas').innerHTML = CATS.filter(c => c.g === 'lineas').map(card).join('');
+  $('#btnLineas').hidden = !LINEAS_IDS.length;
+  $('#btnListados').hidden = !LINEAS_IDS.length;
+  $('#lineasInfo').textContent = LINEAS_IDS.length ? `Preguntas de ${LINEAS_IDS.length === 1 ? '1 línea' : `${LINEAS_IDS.length} líneas`} · solo con los listados oficiales` : '';
   const nt = TEMARIO_IDS.reduce((a, id) => a + TEMARIO.preguntas[id].length, 0);
   $('#btnTemario').hidden = !nt;
   $('#temarioInfo').textContent = `${Math.min(80, nt)} preguntas ${TEMARIO_IDS.length === 1 ? 'del tema disponible' : `de los ${TEMARIO_IDS.length} temas disponibles`} · 80 min · los fallos restan ⅓`;
@@ -564,6 +575,13 @@ document.addEventListener('click', e => {
 });
 $('#btnExam').onclick = () => startQuiz(CATS.map(c => c.id), 'exam');
 $('#btnMix').onclick = () => startQuiz([...VERBAL, ...ESPACIAL]);
+$('#btnLineas').onclick = () => startQuiz(LINEAS_IDS);
+$('#btnListados').onclick = () => {
+  $('#listadosBox').innerHTML = LIN.lineas.map(l => `<div class="lt" style="--lc:${l.color}"><h3>${l.nombre} <small>${LIN.est[l.id].length} estaciones</small></h3>` +
+    l.tramos.map((t, i) => `${l.tramos.length > 1 ? `<p class="lt-tramo">Tramo ${i + 1}</p>` : ''}<ol>${t.map(s => `<li>${s}</li>`).join('')}</ol>`).join('') + '</div>').join('');
+  show('listados');
+};
+$('#btnListadosBack').onclick = () => show('home');
 $('#btnTemario').onclick = () => startQuiz(TEMARIO_IDS, 'temario');
 $('#btnReview').onclick = () => startQuiz(PSICO, 'review');
 $('#btnReviewTem').onclick = () => startQuiz(TEMARIO_IDS, 'review');
