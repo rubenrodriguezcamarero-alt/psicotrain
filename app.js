@@ -578,7 +578,7 @@ $('#btnMix').onclick = () => startQuiz([...VERBAL, ...ESPACIAL]);
 $('#btnLineas').onclick = () => startQuiz(LINEAS_IDS);
 $('#btnListados').onclick = () => {
   $('#listadosBox').innerHTML = LIN.lineas.map(l => `<div class="lt" style="--lc:${l.color}"><h3>${l.nombre} <small>${LIN.est[l.id].length} estaciones</small></h3>` +
-    l.tramos.map((t, i) => `${l.tramos.length > 1 ? `<p class="lt-tramo">Tramo ${i + 1}</p>` : ''}<ol>${t.map(s => `<li>${s}${(l.corr?.[s] || []).map(c => `<span class="cb cb-${c}">${c === 'r' ? 'R' : c.startsWith('ml') ? 'ML' + c.slice(2) : c.slice(1)}</span>`).join('')}</li>`).join('')}</ol>`).join('') + '</div>').join('');
+    l.tramos.map((t, i) => `${l.tramos.length > 1 ? `<p class="lt-tramo">Tramo ${i + 1}</p>` : ''}<ol>${t.map(s => `<li>${s}${(typeof TRANSBORDOS !== 'undefined' ? TRANSBORDOS : []).flatMap(([a, la, b, lb]) => a === s && la === l.id ? [b] : b === s && lb === l.id ? [a] : []).map(o => ` <small class="tb">↔ ${o}</small>`).join('')}${(l.corr?.[s] || []).map(c => `<span class="cb cb-${c}">${c === 'r' ? 'R' : c.startsWith('ml') ? 'ML' + c.slice(2) : c.slice(1)}</span>`).join('')}</li>`).join('')}</ol>`).join('') + '</div>').join('');
   show('listados');
 };
 $('#btnListadosBack').onclick = () => show('home');

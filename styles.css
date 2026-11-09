@@ -416,3 +416,4 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .cb-l11 { background: #0b8c3c; }
 .cb-l12 { background: #a49a00; }
 .cb-ml1, .cb-ml2, .cb-ml3, .cb-r { background: #fff; color: #1d60a9; border: 1px solid #1d60a9; line-height: 15px; }
+.tb { color: var(--muted); font-weight: 600; }

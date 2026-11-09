@@ -130,6 +130,16 @@ const Lineas = (() => {
       return [`Según el plano de la ${nom(id)}, ¿con cuántas líneas (Metro, Metro Ligero o Ramal) tiene correspondencia la estación <b>${s}</b>?`, String(n), ws,
         `${s}: ${ls.map(nom).join(', ')}.`];
     },
+    // Transbordos entre estaciones con distinto nombre
+    transbordo(id) {
+      const TB = (typeof TRANSBORDOS !== 'undefined' ? TRANSBORDOS : []).flatMap(([a, la, b, lb]) => [[a, la, b, lb], [b, lb, a, la]])
+        .filter(([a, la, , lb]) => la === id && byId[lb]);
+      if (!TB.length) return null;
+      const [a, , b, lb] = pick(TB);
+      const ws = shuffle(est[lb].filter(s => s !== b && !tiene(id, s))).slice(0, 2); if (ws.length < 2) return null;
+      return [`La estación <b>${a}</b> (${nom(id)}) tiene transbordo con una estación de la ${nom(lb)} que tiene otro nombre. ¿Cuál es?`, b, ws,
+        `${a} (${nom(id)}) ↔ ${b} (${nom(lb)}): transbordo mutuo.`];
+    },
   };
   const NOMBRES = Object.keys(TIPOS);
   function pregunta(id, spec) {
