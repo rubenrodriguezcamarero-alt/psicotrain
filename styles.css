@@ -417,3 +417,12 @@ h3.sec { margin: 6px 4px 10px; font-size: 15px; color: var(--muted); text-transf
 .cb-l12 { background: #a49a00; }
 .cb-ml1, .cb-ml2, .cb-ml3, .cb-r { background: #fff; color: #1d60a9; border: 1px solid #1d60a9; line-height: 15px; }
 .tb { color: var(--muted); font-weight: 600; }
+/* Dados celdilla */
+.figsvg .dc { fill: var(--card-2, #fff); stroke: var(--cube-edge); stroke-width: .03; }
+.figsvg .dg { fill: #4b4b5e; stroke: var(--cube-edge); stroke-width: .03; }
+.figsvg .dq { fill: #fff; font: 800 .5px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+.figsvg .dn { fill: #1e1b4b; font: 800 .62px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+.figsvg .dnl { stroke: #1e1b4b; stroke-width: .06; stroke-linecap: round; }
+.dado-fin { float: right; width: 64px; height: 76px; margin: 0 0 4px 10px; }
+.reffig.tablero { width: 100%; max-width: 360px; height: auto; padding: 10px; }
+.figsvg.tab { height: auto; }

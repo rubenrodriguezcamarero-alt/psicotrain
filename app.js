@@ -11,6 +11,7 @@ const CATS = [
   { id: 'contar', name: 'Contar cubos', em: '🧊', desc: '¿Cuántos hay?', c1: '#06b6d4', c2: '#2563eb', g: 'spatial' },
   { id: 'vistas', name: 'Vistas', em: '👁️', desc: 'Desde arriba', c1: '#84cc16', c2: '#059669', g: 'spatial' },
   { id: 'papel', name: 'Papel plegado', em: '📄', desc: 'Dobla y perfora', c1: '#fb7185', c2: '#9333ea', g: 'spatial' },
+  { id: 'dados', name: 'Dados celdilla', em: '🎲', desc: 'Hazlo rodar', c1: '#0ea5e9', c2: '#22c55e', g: 'spatial' },
   { id: 'encajar', name: 'Encajar piezas', em: '🔲', desc: 'Completa el hueco', c1: '#475569', c2: '#7c3aed', g: 'spatial', wide: true },
   { id: 'sinonimos', name: 'Sinónimos', em: '🤝', desc: 'Mismo significado', c1: '#14b8a6', c2: '#0284c7', g: 'verbal' },
   { id: 'antonimos', name: 'Antónimos', em: '⚖️', desc: 'Significado opuesto', c1: '#f43f5e', c2: '#f59e0b', g: 'verbal' },

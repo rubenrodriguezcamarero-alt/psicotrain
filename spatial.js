@@ -3,6 +3,7 @@
 // Usa algunas utilidades de figures.js (bloques y rotaciones 3D).
 const Spatial = (() => {
   const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
   const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const r2 = v => Math.round(v * 100) / 100 || 0;
   const { Blocks: B, Cubes, ROTS } = Fig._test;
@@ -406,6 +407,101 @@ const Spatial = (() => {
     throw new Error('No se pudo generar encajar');
   }
 
-  return { desarrollos, contar, vistas, papel, encajar, _test: { NETS, fold, views, unfold, FOLDS, canon2, planta } };
+  // =====================================================================
+  // 6) DADOS CELDILLA: hacer rodar un dado por las celdas oscuras
+  // =====================================================================
+  // Orientación del dado: número en cada dirección. t = arriba, b = base, px/nx = ±x, py/ny = ±y.
+  // En el dibujo se ven arriba, +x (cara de la derecha) y +y (cara de la izquierda).
+  const DIRS = { px: [1, 0], nx: [-1, 0], py: [0, 1], ny: [0, -1] };
+  const OPP = { px: 'nx', nx: 'px', py: 'ny', ny: 'py', t: 'b', b: 't' };
+  // Rodar hacia d: la cara que estaba en el lado contrario a d sube arriba, la de arriba pasa a mirar hacia d
+  const rodar = (o, d) => { const n = { ...o }; n.t = o[OPP[d]]; n[d] = o.t; n.b = o[d]; n[OPP[d]] = o.b; return n; };
+  const DIR_TXT = { px: 'abajo a la derecha', nx: 'arriba a la izquierda', py: 'abajo a la izquierda', ny: 'arriba a la derecha' };
+  function dadoInicial() {
+    const t = 1 + rnd(6), r = shuffle([1, 2, 3, 4, 5, 6].filter(v => v !== t && v !== 7 - t))[0];
+    const l = shuffle([1, 2, 3, 4, 5, 6].filter(v => ![t, 7 - t, r, 7 - r].includes(v)))[0];
+    return { t, b: 7 - t, px: r, nx: 7 - r, py: l, ny: 7 - l };
+  }
+  // Caras visibles del dado dibujadas con el número en perspectiva (texto derecho en cada cara)
+  function dadoSvgParts(o, cx, cy) {
+    const P = (x, y, z) => proj(x + cx, y + cy, z);
+    const caras = [
+      ['d1', P(0, 0, 1), P(1, 0, 1), P(0, 1, 1), o.t],
+      ['d2', P(1, 1, 1), P(1, 0, 1), P(1, 1, 0), o.px],
+      ['d3', P(0, 1, 1), P(1, 1, 1), P(0, 1, 0), o.py],
+    ];
+    return caras.map(([cls, or, u, v, n]) => `<g transform="${faceMatrix(or, u, v)}"><rect width="1" height="1" class="${cls}"/>` +
+      `<text x=".5" y=".5" class="dn">${n}</text>${n === 6 || n === 9 ? '<line x1=".36" y1=".8" x2=".64" y2=".8" class="dnl"/>' : ''}</g>`).join('');
+  }
+  function tableroSvg(N, path, o) {
+    const [sx, sy] = path[0], fin = path[path.length - 1];
+    const enCamino = new Set(path.slice(1).map(c => c.join(',')));
+    let s = '';
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const k = x + ',' + y, cls = enCamino.has(k) ? 'dg' : 'dc';
+      s += `<polygon points="${pts([proj(x, y, 0), proj(x + 1, y, 0), proj(x + 1, y + 1, 0), proj(x, y + 1, 0)])}" class="${cls}"/>`;
+    }
+    const [qx, qy] = proj(fin[0] + .5, fin[1] + .5, 0);
+    s += `<text x="${r2(qx)}" y="${r2(qy)}" class="dq">?</text>`;
+    s += dadoSvgParts(o, sx, sy);
+    const all = [proj(0, 0, 0), proj(N, 0, 0), proj(0, N, 0), proj(N, N, 0), proj(sx, sy, 1)];
+    const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
+    const x0 = Math.min(...xs) - .15, y0 = Math.min(...ys) - .15, W = Math.max(...xs) - x0 + .15, H = Math.max(...ys) - y0 + .15;
+    return `<svg viewBox="${r2(x0)} ${r2(y0)} ${r2(W)} ${r2(H)}" class="figsvg tab" aria-hidden="true">${s}</svg>`;
+  }
+  const dadoSolo = o => `<svg viewBox="-1.05 -1.25 2.1 2.5" class="figsvg" aria-hidden="true">${dadoSvgParts(o, 0, 0)}</svg>`;
+  // Camino sin repetir celdas y sin ambigüedad (dos celdas del camino solo se tocan si son consecutivas)
+  function caminoDado(N, pasos) {
+    for (let t = 0; t < 400; t++) {
+      const start = [rnd(N), rnd(N)], path = [start], dirs = [];
+      // Las celdas justo detrás del dado quedan tapadas por él en el dibujo
+      const tapadas = new Set([[-1, 0], [0, -1], [-1, -1]].map(([a, b]) => (start[0] + a) + ',' + (start[1] + b)));
+      let ok = true;
+      for (let k = 0; k < pasos && ok; k++) {
+        const [x, y] = path[path.length - 1];
+        const cand = shuffle(Object.keys(DIRS)).filter(d => {
+          const nx = x + DIRS[d][0], ny = y + DIRS[d][1], key = nx + ',' + ny;
+          if (nx < 0 || ny < 0 || nx >= N || ny >= N || tapadas.has(key)) return false;
+          // no tocar ninguna celda anterior salvo la actual
+          return path.every((c, i) => { const dd = Math.abs(c[0] - nx) + Math.abs(c[1] - ny); return dd > 1 || (i === path.length - 1 && dd === 1); });
+        });
+        if (!cand.length) { ok = false; break; }
+        const d = cand[0]; dirs.push(d); path.push([x + DIRS[d][0], y + DIRS[d][1]]);
+      }
+      if (ok) return { path, dirs };
+    }
+    return null;
+  }
+  const PREG = {
+    t: ['arriba', 'en la cara de <b>arriba</b>'],
+    b: ['en la base', 'en la <b>base</b> (la cara que toca el suelo)'],
+    px: ['en la cara de la derecha', 'en la cara de la <b>derecha</b> (la que se ve a la derecha en el dibujo)'],
+    py: ['en la cara de la izquierda', 'en la cara de la <b>izquierda</b> (la que se ve a la izquierda en el dibujo)'],
+    nx: ['en la opuesta a la derecha', 'en la cara <b>opuesta a la de la derecha</b> (la oculta de atrás a la izquierda)'],
+    ny: ['en la opuesta a la izquierda', 'en la cara <b>opuesta a la de la izquierda</b> (la oculta de atrás a la derecha)'],
+  };
+  function dados(diff) {
+    const L = level(diff);
+    const N = [4, 5, 5, 6][L], pasos = [[2, 3], [3, 4], [4, 6], [6, 8]][L];
+    const r = caminoDado(N, pasos[0] + rnd(pasos[1] - pasos[0] + 1)); if (!r) return dados('facil');
+    const o0 = dadoInicial();
+    let o = o0; const estados = [];
+    r.dirs.forEach(d => { o = rodar(o, d); estados.push([d, o]); });
+    const que = L === 0 ? pick(['t', 'b']) : L === 1 ? pick(['t', 'b', 'px', 'py']) : pick(Object.keys(PREG));
+    const ans = o[que];
+    // Distractores: el número opuesto (error típico) y otros posibles
+    const ws = [...new Set([7 - ans, o0[que], ...shuffle([1, 2, 3, 4, 5, 6])])].filter(v => v !== ans).slice(0, 3);
+    const pasosTxt = estados.map(([d, e], i) => `${i + 1}. ${DIR_TXT[d]} → arriba <b>${e.t}</b>, base ${e.b}`).join('<br>');
+    return {
+      cat: 'dados', kind: 'text',
+      prompt: `Haz rodar el dado por las <b>celdas oscuras</b> hasta el <b>?</b>. ¿Qué número quedará ${PREG[que][1]}? <small class="hint">(las caras opuestas siempre suman 7)</small>`,
+      figHtml: ref(tableroSvg(N, r.path, o0), '', 'tablero'),
+      options: shuffle([{ t: String(ans), ok: true }, ...ws.map(v => ({ t: String(v) }))]),
+      explain: `<span class="dado-fin">${dadoSolo(o)}</span>Al rodar, la cara del lado contrario al movimiento sube arriba.<br>${pasosTxt}<br>Queda <b>${ans}</b> ${PREG[que][0]}.`,
+      _dado: { o0, dirs: r.dirs, path: r.path, que, ans, fin: o },
+    };
+  }
+
+  return { desarrollos, contar, vistas, papel, encajar, dados, _test: { rodar, DIRS, OPP, NETS, fold, views, unfold, FOLDS, canon2, planta } };
 })();
 if (typeof module !== 'undefined') module.exports = Spatial;
