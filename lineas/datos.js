@@ -5,6 +5,9 @@
 // Indicaciones del usuario: «Plaza Castilla» se unifica como «Plaza de Castilla»; El Casar es la
 // cabecera de la Línea 3, justo antes de Villaverde Alto; Noviciado (L2) y Plaza de España (L3) son
 // transbordo mutuo, igual que Acacias (L5) y Embajadores (L3).
+// cabeceras = cuadro de cabeceras enviado por el usuario (líneas sin listado de estaciones todavía).
+// Línea 6: listado del usuario, leído de arriba abajo (circular: tras Lucero vuelve a Laguna).
+// Se desarrollaron las abreviaturas del cuadro: «N. Ministerios», «Hosp. Infanta Sofía», «P. del Sur».
 // Cada línea: estaciones en orden de una cabecera a la otra. Si una línea tiene ramales,
 // cada ramal va en su propio tramo (lista). Las líneas sin listado aún tienen tramos vacíos.
 const LINEAS = [
@@ -23,14 +26,16 @@ const LINEAS = [
   { id: 'l5', nombre: 'Línea 5', color: '#8fbf26', circular: false, 
     tramos: [["Alameda de Osuna", "El Capricho", "Canillejas", "Torre Arias", "Suanzes", "Ciudad Lineal", "Pueblo Nuevo", "Quintana", "El Carmen", "Ventas", "Diego de León", "Núñez de Balboa", "Rubén Darío", "Alonso Martínez", "Chueca", "Gran Vía", "Callao", "Ópera", "La Latina", "Puerta de Toledo", "Acacias", "Pirámides", "Marqués de Vadillo", "Urgel", "Oporto", "Vista Alegre", "Carabanchel", "Eugenia de Montijo", "Aluche", "Empalme", "Campamento", "Casa de Campo"]],
     corr: {"Pueblo Nuevo": ["l7"], "Ventas": ["l2"], "Diego de León": ["l4", "l6"], "Núñez de Balboa": ["l9"], "Alonso Martínez": ["l4", "l10"], "Gran Vía": ["l1"], "Callao": ["l3"], "Ópera": ["l2", "r"], "Acacias": ["l3"], "Oporto": ["l6"], "Casa de Campo": ["l10"]} },
-  { id: 'l6', nombre: 'Línea 6', color: '#8c8c8c', circular: false, tramos: [] },
-  { id: 'l7', nombre: 'Línea 7', color: '#f39200', circular: false, tramos: [] },
-  { id: 'l8', nombre: 'Línea 8', color: '#ec82b1', circular: false, tramos: [] },
-  { id: 'l9', nombre: 'Línea 9', color: '#a3238e', circular: false, tramos: [] },
-  { id: 'l10', nombre: 'Línea 10', color: '#00539f', circular: false, tramos: [] },
-  { id: 'l11', nombre: 'Línea 11', color: '#0b8c3c', circular: false, tramos: [] },
-  { id: 'l12', nombre: 'Línea 12', color: '#a49a00', circular: false, tramos: [] },
-  { id: 'ml', nombre: 'Metro Ligero', color: '#4fb3e0', circular: false, tramos: [] },
+  { id: 'l6', nombre: 'Línea 6', color: '#8c8c8c', circular: true, via: 'Vía interior (Andén I)',
+    tramos: [["Laguna", "Carpetana", "Oporto", "Opañel", "Plaza Elíptica", "Usera", "Legazpi", "Arganzuela-Planetario", "Méndez Álvaro", "Pacífico", "Conde de Casal", "Sainz de Baranda", "O’Donnell", "Manuel Becerra", "Diego de León", "Avenida de América", "República Argentina", "Nuevos Ministerios", "Cuatro Caminos", "Guzmán el Bueno", "Vicente Aleixandre", "Ciudad Universitaria", "Moncloa", "Argüelles", "Príncipe Pío", "Puerta del Ángel", "Alto de Extremadura", "Lucero"]] },
+  { id: 'l7', nombre: 'Línea 7', color: '#f39200', circular: false, cabeceras: ['Hospital de Henares', 'Pitis'], tramos: [] },
+  { id: 'l8', nombre: 'Línea 8', color: '#ec82b1', circular: false, cabeceras: ['Nuevos Ministerios', 'Aeropuerto T4'], tramos: [] },
+  { id: 'l9', nombre: 'Línea 9', color: '#a3238e', circular: false, cabeceras: ['Arganda del Rey', 'Paco de Lucía'], tramos: [] },
+  { id: 'l10', nombre: 'Línea 10', color: '#00539f', circular: false, cabeceras: ['Hospital Infanta Sofía', 'Puerta del Sur'], tramos: [] },
+  { id: 'l11', nombre: 'Línea 11', color: '#0b8c3c', circular: false, cabeceras: ['Plaza Elíptica', 'La Fortuna'], tramos: [] },
+  { id: 'l12', nombre: 'Línea 12', color: '#a49a00', circular: true, via: 'Vía interior (Andén I)', tramos: [] },
+  { id: 'r', nombre: 'Ramal', color: '#1d60a9', circular: false, cabeceras: ['Ópera', 'Príncipe Pío'], tramos: [] },
+  { id: 'ml1', nombre: 'ML-1', color: '#4fb3e0', circular: false, cabeceras: ['Las Tablas', 'Pinar de Chamartín'], tramos: [] },
 ];
 // Transbordos entre estaciones con distinto nombre (indicados por el usuario): [estación, línea, estación, línea]
 const TRANSBORDOS = [

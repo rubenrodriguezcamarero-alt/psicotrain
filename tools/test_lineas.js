@@ -10,10 +10,12 @@ for (const a of Lineas.lineas) for (const [s, ls] of Object.entries(a.corr || {}
   const enB = Object.keys(b.corr || {}).find(x => norm(x) === norm(s));
   if (enB && !b.corr[enB].includes(a.id)) { fallos++; console.log(`Correspondencia no recíproca: ${s} ${a.id}->${o}`); }
 }
-for (const l of Lineas.lineas) for (const t in T) for (let k = 0; k < 300; k++) {
+for (const l of Lineas.lineas) for (const t of (Lineas.est[l.id].length ? Object.keys(T) : Lineas._test.SOLO_CABECERAS)) for (let k = 0; k < 300; k++) {
   const r = T[t](l.id); if (!r) continue; n++; cuenta[t] = (cuenta[t] || 0) + 1;
   const [p, ok, ws] = r;
   if (new Set([ok, ...ws]).size !== 3 || ws.length !== 2) { fallos++; console.log('Opciones repetidas', t, l.id, ok, ws); }
 }
 console.log(`${n} preguntas generadas`, cuenta, fallos ? `${fallos} fallos` : 'todo correcto');
+// Cada línea disponible debe poder generar preguntas desde la app
+for (const l of Lineas.lineas) for (let k = 0; k < 50; k++) if (!Lineas.pregunta(l.id)) { fallos++; console.log('Sin preguntas para', l.id); break; }
 process.exit(fallos ? 1 : 0);

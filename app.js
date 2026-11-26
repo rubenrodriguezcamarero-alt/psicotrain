@@ -30,9 +30,10 @@ TEMAS.forEach(t => CATS.push({ id: t.id, name: `${t.num}. ${t.name}`, em: t.em, 
   desc: t.n ? `${t.n} preguntas` : t.privado ? 'Solo en la versión privada' : 'Pendiente del PDF', off: !t.n }));
 // Líneas de Metro (listados en lineas/datos.js)
 const LIN = typeof Lineas !== 'undefined' ? Lineas : { lineas: [], todas: [], est: {} };
-LIN.todas.forEach(l => { const n = LIN.est[l.id]?.length;
+LIN.todas.forEach(l => { const n = LIN.est[l.id]?.length, ok = LIN.lineas.includes(l);
+  const c = ok && LIN.cabs(l);
   CATS.push({ id: l.id, name: l.nombre, em: '🚇', c1: l.color, c2: l.color, g: 'lineas',
-    desc: n ? `${n} estaciones` : 'Pendiente del listado', off: !n }); });
+    desc: n ? `${n} estaciones${l.circular ? ' · circular' : ''}` : c ? c.join(' – ') : l.circular ? 'Circular' : 'Pendiente del listado', off: !ok }); });
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 const LINEAS_IDS = CATS.filter(c => c.g === 'lineas' && !c.off).map(c => c.id);
 const TEMARIO_IDS = CATS.filter(c => c.g === 'temario' && !c.off).map(c => c.id);
@@ -578,7 +579,9 @@ $('#btnExam').onclick = () => startQuiz(CATS.map(c => c.id), 'exam');
 $('#btnMix').onclick = () => startQuiz([...VERBAL, ...ESPACIAL]);
 $('#btnLineas').onclick = () => startQuiz(LINEAS_IDS);
 $('#btnListados').onclick = () => {
-  $('#listadosBox').innerHTML = LIN.lineas.map(l => `<div class="lt" style="--lc:${l.color}"><h3>${l.nombre} <small>${LIN.est[l.id].length} estaciones</small></h3>` +
+  $('#listadosBox').innerHTML = LIN.lineas.map(l => `<div class="lt" style="--lc:${l.color}"><h3>${l.nombre} <small>${LIN.est[l.id].length ? `${LIN.est[l.id].length} estaciones` : 'listado de estaciones pendiente'}${l.circular ? ' · circular' : ''}</small></h3>` +
+    (LIN.est[l.id].length ? '' : `<p class="lt-tramo">${l.circular ? `Circular. ${l.via || ''}` : `Cabeceras: ${LIN.cabs(l).join(' – ')}`}</p>`) +
+    (LIN.est[l.id].length && l.circular ? `<p class="lt-tramo">Circular${l.via ? '. ' + l.via : ''}: tras ${l.tramos[0][l.tramos[0].length - 1]} vuelve a ${l.tramos[0][0]}</p>` : '') +
     l.tramos.map((t, i) => `${l.tramos.length > 1 ? `<p class="lt-tramo">Tramo ${i + 1}</p>` : ''}<ol>${t.map(s => `<li>${s}${(typeof TRANSBORDOS !== 'undefined' ? TRANSBORDOS : []).flatMap(([a, la, b, lb]) => a === s && la === l.id ? [b] : b === s && lb === l.id ? [a] : []).map(o => ` <small class="tb">↔ ${o}</small>`).join('')}${(l.corr?.[s] || []).map(c => `<span class="cb cb-${c}">${c === 'r' ? 'R' : c.startsWith('ml') ? 'ML' + c.slice(2) : c.slice(1)}</span>`).join('')}</li>`).join('')}</ol>`).join('') + '</div>').join('');
   show('listados');
 };
