@@ -7,6 +7,7 @@
 // transbordo mutuo, igual que Acacias (L5) y Embajadores (L3).
 // cabeceras = cuadro de cabeceras enviado por el usuario (líneas sin listado de estaciones todavía).
 // Línea 6: listado del usuario, leído de arriba abajo (circular: tras Lucero vuelve a Laguna).
+// «Hospital de Henares» del cuadro corregido a «Hospital del Henares» (indicación del usuario).
 // Se desarrollaron las abreviaturas del cuadro: «N. Ministerios», «Hosp. Infanta Sofía», «P. del Sur».
 // Cada línea: estaciones en orden de una cabecera a la otra. Si una línea tiene ramales,
 // cada ramal va en su propio tramo (lista). Las líneas sin listado aún tienen tramos vacíos.
@@ -28,7 +29,7 @@ const LINEAS = [
     corr: {"Pueblo Nuevo": ["l7"], "Ventas": ["l2"], "Diego de León": ["l4", "l6"], "Núñez de Balboa": ["l9"], "Alonso Martínez": ["l4", "l10"], "Gran Vía": ["l1"], "Callao": ["l3"], "Ópera": ["l2", "r"], "Acacias": ["l3"], "Oporto": ["l6"], "Casa de Campo": ["l10"]} },
   { id: 'l6', nombre: 'Línea 6', color: '#8c8c8c', circular: true, via: 'Vía interior (Andén I)',
     tramos: [["Laguna", "Carpetana", "Oporto", "Opañel", "Plaza Elíptica", "Usera", "Legazpi", "Arganzuela-Planetario", "Méndez Álvaro", "Pacífico", "Conde de Casal", "Sainz de Baranda", "O’Donnell", "Manuel Becerra", "Diego de León", "Avenida de América", "República Argentina", "Nuevos Ministerios", "Cuatro Caminos", "Guzmán el Bueno", "Vicente Aleixandre", "Ciudad Universitaria", "Moncloa", "Argüelles", "Príncipe Pío", "Puerta del Ángel", "Alto de Extremadura", "Lucero"]] },
-  { id: 'l7', nombre: 'Línea 7', color: '#f39200', circular: false, cabeceras: ['Hospital de Henares', 'Pitis'], tramos: [] },
+  { id: 'l7', nombre: 'Línea 7', color: '#f39200', circular: false, cabeceras: ['Hospital del Henares', 'Pitis'], tramos: [] },
   { id: 'l8', nombre: 'Línea 8', color: '#ec82b1', circular: false, cabeceras: ['Nuevos Ministerios', 'Aeropuerto T4'], tramos: [] },
   { id: 'l9', nombre: 'Línea 9', color: '#a3238e', circular: false, cabeceras: ['Arganda del Rey', 'Paco de Lucía'], tramos: [] },
   { id: 'l10', nombre: 'Línea 10', color: '#00539f', circular: false, cabeceras: ['Hospital Infanta Sofía', 'Puerta del Sur'], tramos: [] },
